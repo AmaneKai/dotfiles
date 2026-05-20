@@ -15,7 +15,7 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "clangd", "lua_ls", "tailwindcss", "html",
-          "ts_ls", "gopls", "htmx", "rust_analyzer", "svelte",
+          "vtsls", "gopls", "htmx", "rust_analyzer", "svelte", "eslint",
         },
         handlers = {
           function(server_name)
@@ -29,46 +29,52 @@ return {
             })
           end,
 
-          ["ts_ls"] = function()
-            lspconfig.ts_ls.setup({
+          ["vtsls"] = function()
+            lspconfig.vtsls.setup({
               capabilities = capabilities,
-              root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", ".git"),
-              init_options = {
-                preferences = {
-                  importModuleSpecifierPreference = "non-relative",
-                  includeCompletionsForModuleExports = true,
-                  includeCompletionsWithSnippetText = true,
-                },
-              },
               settings = {
                 typescript = {
+                  updateImportsOnFileMove = { enabled = "always" },
+                  suggest = {
+                    completeFunctionCalls = false,
+                  },
                   preferences = {
+                    importModuleSpecifierPreference = "non-relative",
                     includeCompletionsForModuleExports = true,
-                    includeCompletionsWithSnippetText = true,
                   },
                   inlayHints = {
-                    includeInlayParameterNameHints = "all",
-                    includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                    includeInlayFunctionParameterTypeHints = true,
-                    includeInlayVariableTypeHints = true,
-                    includeInlayPropertyDeclarationTypeHints = true,
-                    includeInlayFunctionLikeReturnTypeHints = true,
-                    includeInlayEnumMemberValueHints = true,
+                    parameterNames = { enabled = "none" },
+                    parameterTypes = { enabled = false },
+                    variableTypes = { enabled = false },
+                    propertyDeclarationTypes = { enabled = false },
+                    functionLikeReturnTypes = { enabled = false },
+                    enumMemberValues = { enabled = false },
                   },
                 },
                 javascript = {
+                  updateImportsOnFileMove = { enabled = "always" },
+                  suggest = {
+                    completeFunctionCalls = false,
+                  },
                   preferences = {
+                    importModuleSpecifierPreference = "non-relative",
                     includeCompletionsForModuleExports = true,
-                    includeCompletionsWithSnippetText = true,
                   },
                   inlayHints = {
-                    includeInlayParameterNameHints = "all",
-                    includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-                    includeInlayFunctionParameterTypeHints = true,
-                    includeInlayVariableTypeHints = true,
-                    includeInlayPropertyDeclarationTypeHints = true,
-                    includeInlayFunctionLikeReturnTypeHints = true,
-                    includeInlayEnumMemberValueHints = true,
+                    parameterNames = { enabled = "none" },
+                    parameterTypes = { enabled = false },
+                    variableTypes = { enabled = false },
+                    propertyDeclarationTypes = { enabled = false },
+                    functionLikeReturnTypes = { enabled = false },
+                    enumMemberValues = { enabled = false },
+                  },
+                },
+                vtsls = {
+                  autoUseWorkspaceTsdk = true,
+                  experimental = {
+                    completion = {
+                      enableServerSideFuzzyMatch = true,
+                    },
                   },
                 },
               },
@@ -168,6 +174,17 @@ return {
           vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references,       opts)
           vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename,           opts)
           vim.keymap.set("i", "<C-h>",       vim.lsp.buf.signature_help,   opts)
+
+          vim.keymap.set("n", "<leader>th", function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
+          end, { desc = "Toggle Inlay Hints", buffer = event.buf })
+
+          vim.keymap.set("n", "<leader>td", function()
+            local config = vim.diagnostic.config()
+            vim.diagnostic.config({
+              virtual_text = not config.virtual_text,
+            })
+          end, { desc = "Toggle Diagnostics", buffer = event.buf })
         end,
       })
     end,

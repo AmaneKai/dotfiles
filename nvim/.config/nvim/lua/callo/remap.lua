@@ -24,7 +24,6 @@ vim.keymap.set({ "n", "v" }, "<leader>d",  [["_d]])
 
 -- LSP utilities
 vim.keymap.set("n", "<leader>zig", "<cmd>LspRestart<cr>")
-vim.keymap.set("n", "<leader>f",   vim.lsp.buf.format)
 
 -- Misc
 vim.keymap.set("i", "<C-c>", "<Esc>")
