@@ -6,6 +6,7 @@ return {
 			typescript = { "eslint_d" },
 			javascriptreact = { "eslint_d" },
 			typescriptreact = { "eslint_d" },
+			svelte = { "prettier", "eslint_d" }, 
 			json = { "prettier" },
 			css = { "prettier" },
 			html = { "prettier" },
