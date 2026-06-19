@@ -1,29 +1,23 @@
 return {
   {
-    "toppair/peek.nvim",
-    event = { "VeryLazy" },
-    build = "deno task --quiet build:fast",
-    keys  = {
-      { "<leader>md", function() require("peek").open() end,  desc = "Peek: Open preview" },
-      { "<leader>mc", function() require("peek").close() end, desc = "Peek: Close preview" },
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreview", "MarkdownPreviewStop", "MarkdownPreviewToggle" },
+    ft = "markdown",
+    build = "cd app && npx --yes yarn install",
+    keys = {
+      { "<leader>md", "<cmd>MarkdownPreviewToggle<CR>", desc = "Markdown: Toggle preview" },
     },
     config = function()
-      local peek = require("peek")
-
-      vim.api.nvim_create_user_command("PeekOpen",  peek.open,  {})
-      vim.api.nvim_create_user_command("PeekClose", peek.close, {})
-
-      peek.setup({
-        auto_load        = true,
-        close_on_bdelete = true,
-        syntax           = true,
-        theme            = "dark",
-        update_on_change = true,
-        app              = "webview",
-        filetype         = { "markdown" },
-        throttle_at      = 200000,
-        throttle_time    = "auto",
-      })
+      vim.g.mkdp_auto_start = 0
+      vim.g.mkdp_auto_close = 1
+      vim.g.mkdp_theme      = "dark"
+      vim.g.mkdp_port       = "8081"
+      vim.g.mkdp_preview_options = {
+        mkit = {},
+        katex = {},
+        uml = {},
+        maid = {},
+      }
     end,
   },
 }

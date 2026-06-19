@@ -1,15 +1,16 @@
 return {
   {
     "chomosuke/typst-preview.nvim",
-    ft      = "typst",
+    ft = "typst",
     version = "1.*",
-    build   = function() require("typst-preview").update() end,
+    build = function() require("typst-preview").update() end,
     opts = {
       debug = false,
       dependencies_bin = {
-        ["typst-preview"] = nil,["websocat"]      = nil,
+        ["typst-preview"] = nil,
+        ["websocat"] = nil,
       },
-      get_root      = function(path) return vim.fn.fnamemodify(path, ":p:h") end,
+      get_root = function(path) return vim.fn.fnamemodify(path, ":p:h") end,
       get_main_file = function(path) return path end,
     },
     config = function(_, opts)
@@ -17,12 +18,12 @@ return {
       preview.setup(opts)
 
       vim.api.nvim_create_autocmd("FileType", {
-        group    = vim.api.nvim_create_augroup("TypstKeymaps", { clear = true }),
-        pattern  = "typst",
+        group = vim.api.nvim_create_augroup("TypstKeymaps", { clear = true }),
+        pattern = "typst",
         callback = function()
           local buf = vim.api.nvim_get_current_buf()
 
-          vim.keymap.set("n", "<leader>tp", "<cmd>TypstPreview<CR>",
+          vim.keymap.set("n", "<leader>ty", "<cmd>TypstPreview<CR>",
             { buffer = buf, desc = "Typst: Start Preview" })
           vim.keymap.set("n", "<leader>tc", "<cmd>TypstPreviewStop<CR>",
             { buffer = buf, desc = "Typst: Stop Preview" })
