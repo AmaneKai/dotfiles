@@ -2,11 +2,12 @@ return {
 	"stevearc/conform.nvim",
 	opts = {
 		formatters_by_ft = {
+			python = { "ruff_format" },
 			javascript = { "eslint_d" },
 			typescript = { "eslint_d" },
 			javascriptreact = { "eslint_d" },
 			typescriptreact = { "eslint_d" },
-			svelte = { "prettier", "eslint_d" }, 
+			svelte = { "prettier", "eslint_d" },
 			json = { "prettier" },
 			css = { "prettier" },
 			html = { "prettier" },

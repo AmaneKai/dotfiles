@@ -16,6 +16,7 @@ return {
         ensure_installed = {
           "clangd", "lua_ls", "tailwindcss", "html",
           "vtsls", "gopls", "htmx", "rust_analyzer", "svelte", "eslint",
+          "pyright",
         },
         handlers = {
           function(server_name)

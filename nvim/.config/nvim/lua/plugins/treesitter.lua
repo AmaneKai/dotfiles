@@ -7,7 +7,7 @@ return {
       ensure_installed = {
         "vimdoc", "javascript", "typescript", "lua", "rust",
         "jsdoc", "bash", "html", "css", "tsx", "json", "go",
-        "markdown", "markdown_inline", "kotlin", "svelte"
+        "markdown", "markdown_inline", "kotlin", "svelte", "python"
       },
     })
 
