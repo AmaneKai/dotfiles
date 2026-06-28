@@ -7,7 +7,7 @@ return {
       if not vim.g.kotlin_notify_patched then
         local orig_notify = vim.notify
         vim.notify = function(msg, level, opts)
-          if type(msg) == "string" and msg:find("kotlin_ls quit with exit code") then
+          if type(msg) == "string" and (msg:find("kotlin_ls quit with exit code") or msg:find("kotlin_lsp quit with exit code")) then
             return
           end
           return orig_notify(msg, level, opts)
