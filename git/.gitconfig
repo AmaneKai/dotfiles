@@ -8,11 +8,22 @@
 [alias]
     st = status
     ad = add
+
     br = branch
-    ci = commit
+    bra = branch -a
+    brr = branch -r
+
     co = checkout
+    cob = checkout -b
+
+    ci = commit
+    cia = commit --amend --no-edit
+
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
 	purge = !git branch -D
+
+    mg = merge
+    mgs = merge --squash --ff
 
 [fetch]
     prune = true
