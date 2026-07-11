@@ -1,0 +1,70 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "source": "~/.config/fastfetch/logo/frieren.txt",
+        "padding": {
+            "top": 2,
+            "left": 3
+        },
+        "color": {
+            "1": "white",    // Hair Top
+            "2": "cyan",     // Eye area / Glow
+            "3": "magenta",  // Eyes / Details
+            "4": "white",    // Face
+            "5": "blue"      // Bottom / Clothes
+        }
+    },
+    "display": {
+        "separator": "  ",
+        "color": {
+            "keys": "cyan"
+        }
+    },
+    "modules": [
+        "break",
+        {
+            "type": "title",
+            "color": {
+                "user": "white",
+                "at": "cyan",
+                "host": "white"
+            }
+        },
+        "break",
+        {
+            "type": "os",
+            "key": "󰣇 ",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "kernel",
+            "key": " ",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "shell",
+            "key": " ",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "wm",
+            "key": " ",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "uptime",
+            "key": "󱎫 ",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "memory",
+            "key": "󰍛 ",
+            "keyColor": "cyan"
+        },
+        "break",
+        {
+            "type": "colors",
+            "symbol": "circle"
+        }
+    ]
+}
