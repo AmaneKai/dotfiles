@@ -19,7 +19,7 @@ return {
       local dirs = vim.fn.glob(kotlin_lsp_base .. "/kotlin-server-*", false, true)
       local versioned = dirs[1] or kotlin_lsp_base
       vim.env.KOTLIN_LSP_DIR = versioned
-      vim.env.JAVA_HOME = versioned .. "/jbr/Contents/Home"
+      vim.env.JAVA_HOME = versioned .. (vim.fn.has("mac") == 1 and "/jbr/Contents/Home" or "/jbr")
 
       require("kotlin").setup({
         root_markers = { "gradlew", ".git", "settings.gradle", "build.gradle.kts" },
