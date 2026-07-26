@@ -10,7 +10,14 @@ return {
         ["typst-preview"] = nil,
         ["websocat"] = nil,
       },
-      get_root = function(path) return vim.fn.fnamemodify(path, ":p:h") end,
+      get_root = function(path)
+        local dir = vim.fn.fnamemodify(path, ":p:h")
+        local root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(dir) .. " rev-parse --show-toplevel")[1]
+        if root and root ~= "" and vim.v.shell_error == 0 then
+          return root
+        end
+        return dir -- fallback: not in a git repo, just use the file's own directory
+      end,
       get_main_file = function(path) return path end,
     },
     config = function(_, opts)

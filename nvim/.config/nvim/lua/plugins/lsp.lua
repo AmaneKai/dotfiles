@@ -7,7 +7,12 @@ return {
       "saghen/blink.cmp",
     },
     config = function()
-      require("mason").setup()
+      require("mason").setup({
+        registries = {
+          "github:Crashdummyy/mason-registry",
+          "github:mason-org/mason-registry",
+        },
+      })
       local lspconfig = require("lspconfig")
       local has_blink, blink = pcall(require, "blink.cmp")
       local capabilities = has_blink and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()

@@ -1,6 +1,10 @@
 local augroup = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+vim.filetype.add({
+  extension = { ipynb = "ipynb" },
+})
+
 local webdev_group = augroup("WebDevIndent", { clear = true })
 
 autocmd("FileType", {
@@ -16,4 +20,3 @@ autocmd("FileType", {
     vim.opt_local.expandtab = true
   end,
 })
-
