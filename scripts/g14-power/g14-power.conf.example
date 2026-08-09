@@ -1,0 +1,25 @@
+# g14-power policy
+# Hybrid <-> Integrated normally requires a graphical logout.
+# Use Keep to leave the GPU mode unchanged for a profile.
+
+BATTERY_CPU_PROFILE="power-saver"
+BALANCED_CPU_PROFILE="balanced"
+GAMING_CPU_PROFILE="performance"
+
+BATTERY_GPU_MODE="Integrated"
+BALANCED_GPU_MODE="Hybrid"
+GAMING_GPU_MODE="Hybrid"
+GPU_AUTO_SWITCH=1
+
+BATTERY_BOOST=0
+BALANCED_BOOST=1
+GAMING_BOOST=1
+
+BATTERY_AUDIO_POWER_SAVE=1
+BALANCED_AUDIO_POWER_SAVE=1
+GAMING_AUDIO_POWER_SAVE=0
+
+AUTO_BATTERY_PROFILE="battery"
+AUTO_AC_PROFILE="balanced"
+EVENT_SETTLE_SECONDS=2
+SUPERGFX_TIMEOUT_SECONDS=4

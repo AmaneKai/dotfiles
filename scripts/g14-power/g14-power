@@ -1,0 +1,1173 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+shopt -s nullglob
+
+readonly VERSION="1.0.2-local"
+readonly PROGRAM="g14-power"
+readonly SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+
+SYS_ROOT="${G14_POWER_SYS_ROOT:-/sys}"
+CONFIG_FILE="${G14_POWER_CONFIG:-/etc/g14-power.conf}"
+STATE_DIR="${G14_POWER_STATE_DIR:-/run/g14-power}"
+STATE_FILE="$STATE_DIR/state"
+LOCK_FILE="$STATE_DIR/lock"
+
+DRY_RUN=0
+SERVICE_MODE=0
+
+BATTERY_CPU_PROFILE="power-saver"
+BALANCED_CPU_PROFILE="balanced"
+GAMING_CPU_PROFILE="performance"
+BATTERY_GPU_MODE="Integrated"
+BALANCED_GPU_MODE="Hybrid"
+GAMING_GPU_MODE="Hybrid"
+BATTERY_BOOST=0
+BALANCED_BOOST=1
+GAMING_BOOST=1
+BATTERY_AUDIO_POWER_SAVE=1
+BALANCED_AUDIO_POWER_SAVE=1
+GAMING_AUDIO_POWER_SAVE=0
+AUTO_BATTERY_PROFILE="battery"
+AUTO_AC_PROFILE="balanced"
+GPU_AUTO_SWITCH=1
+EVENT_SETTLE_SECONDS=2
+SUPERGFX_TIMEOUT_SECONDS=4
+
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]
+then
+    C_RESET=$'\033[0m'
+    C_BOLD=$'\033[1m'
+    C_DIM=$'\033[2m'
+    C_GREEN=$'\033[32m'
+    C_YELLOW=$'\033[33m'
+    C_RED=$'\033[31m'
+    C_CYAN=$'\033[36m'
+else
+    C_RESET=""
+    C_BOLD=""
+    C_DIM=""
+    C_GREEN=""
+    C_YELLOW=""
+    C_RED=""
+    C_CYAN=""
+fi
+
+header ()
+{
+    local action=${1:-}
+
+    if [[ -n "$action" ]]
+    then
+        printf '%s%s %s%s %sv%s%s\n\n' "$C_BOLD" "$PROGRAM" "$action" "$C_RESET" "$C_DIM" "$VERSION" "$C_RESET"
+    else
+        printf '%s%s%s %sv%s%s\n\n' "$C_BOLD" "$PROGRAM" "$C_RESET" "$C_DIM" "$VERSION" "$C_RESET"
+    fi
+}
+
+ok ()
+{
+    printf ' %s✓%s %s\n' "$C_GREEN" "$C_RESET" "$*"
+}
+
+info ()
+{
+    printf ' %s→%s %s\n' "$C_CYAN" "$C_RESET" "$*"
+}
+
+warn ()
+{
+    printf ' %s!%s %s\n' "$C_YELLOW" "$C_RESET" "$*" >&2
+}
+
+fail ()
+{
+    printf ' %s✗%s %s\n' "$C_RED" "$C_RESET" "$*" >&2
+}
+
+die ()
+{
+    fail "$*"
+    exit 1
+}
+
+row ()
+{
+    printf '   %s%-10s%s %s\n' "$C_DIM" "$1" "$C_RESET" "$2"
+}
+
+quote_command ()
+{
+    printf '%q ' "$@"
+}
+
+run ()
+{
+    if (( DRY_RUN ))
+    then
+        info "would run: $(quote_command "$@")"
+        return 0
+    fi
+
+    "$@"
+}
+
+require_root ()
+{
+    if (( EUID == 0 || DRY_RUN ))
+    then
+        return 0
+    fi
+
+    command -v sudo >/dev/null 2>&1 || die "this command needs root and sudo is unavailable"
+    exec sudo -- "$SELF" "$@"
+}
+
+read_value ()
+{
+    local path=$1
+
+    [[ -r "$path" ]] || return 1
+    IFS= read -r REPLY < "$path" || true
+    printf '%s\n' "$REPLY"
+}
+
+is_one_of ()
+{
+    local value=$1
+    shift
+    local item
+
+    for item in "$@"
+    do
+        [[ "$value" == "$item" ]] && return 0
+    done
+
+    return 1
+}
+
+trim ()
+{
+    local value=$1
+
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    printf '%s\n' "$value"
+}
+
+load_config ()
+{
+    local line key value
+
+    if [[ -r "$CONFIG_FILE" ]]
+    then
+        while IFS= read -r line || [[ -n "$line" ]]
+        do
+            line=$(trim "$line")
+            [[ -z "$line" || "$line" == \#* ]] && continue
+            [[ "$line" == *=* ]] || die "invalid config line: $line"
+            key=$(trim "${line%%=*}")
+            value=$(trim "${line#*=}")
+
+            if [[ "$value" == \"*\" && "$value" == *\" ]]
+            then
+                value=${value:1:${#value}-2}
+            elif [[ "$value" == \'*\' && "$value" == *\' ]]
+            then
+                value=${value:1:${#value}-2}
+            fi
+
+            case "$key" in
+                BATTERY_CPU_PROFILE|BALANCED_CPU_PROFILE|GAMING_CPU_PROFILE|\
+                BATTERY_GPU_MODE|BALANCED_GPU_MODE|GAMING_GPU_MODE|\
+                BATTERY_BOOST|BALANCED_BOOST|GAMING_BOOST|\
+                BATTERY_AUDIO_POWER_SAVE|BALANCED_AUDIO_POWER_SAVE|GAMING_AUDIO_POWER_SAVE|\
+                AUTO_BATTERY_PROFILE|AUTO_AC_PROFILE|GPU_AUTO_SWITCH|\
+                EVENT_SETTLE_SECONDS|SUPERGFX_TIMEOUT_SECONDS)
+                    printf -v "$key" '%s' "$value"
+                    ;;
+                *) die "unknown config key: $key" ;;
+            esac
+        done < "$CONFIG_FILE"
+    fi
+
+    is_one_of "$BATTERY_CPU_PROFILE" power-saver balanced performance || die "invalid BATTERY_CPU_PROFILE"
+    is_one_of "$BALANCED_CPU_PROFILE" power-saver balanced performance || die "invalid BALANCED_CPU_PROFILE"
+    is_one_of "$GAMING_CPU_PROFILE" power-saver balanced performance || die "invalid GAMING_CPU_PROFILE"
+    is_one_of "$BATTERY_GPU_MODE" Integrated Hybrid Keep || die "invalid BATTERY_GPU_MODE"
+    is_one_of "$BALANCED_GPU_MODE" Integrated Hybrid Keep || die "invalid BALANCED_GPU_MODE"
+    is_one_of "$GAMING_GPU_MODE" Integrated Hybrid Keep || die "invalid GAMING_GPU_MODE"
+    is_one_of "$AUTO_BATTERY_PROFILE" battery balanced gaming || die "invalid AUTO_BATTERY_PROFILE"
+    is_one_of "$AUTO_AC_PROFILE" battery balanced gaming || die "invalid AUTO_AC_PROFILE"
+    is_one_of "$GPU_AUTO_SWITCH" 0 1 || die "GPU_AUTO_SWITCH must be 0 or 1"
+    is_one_of "$BATTERY_BOOST" 0 1 || die "BATTERY_BOOST must be 0 or 1"
+    is_one_of "$BALANCED_BOOST" 0 1 || die "BALANCED_BOOST must be 0 or 1"
+    is_one_of "$GAMING_BOOST" 0 1 || die "GAMING_BOOST must be 0 or 1"
+    is_one_of "$BATTERY_AUDIO_POWER_SAVE" 0 1 || die "BATTERY_AUDIO_POWER_SAVE must be 0 or 1"
+    is_one_of "$BALANCED_AUDIO_POWER_SAVE" 0 1 || die "BALANCED_AUDIO_POWER_SAVE must be 0 or 1"
+    is_one_of "$GAMING_AUDIO_POWER_SAVE" 0 1 || die "GAMING_AUDIO_POWER_SAVE must be 0 or 1"
+    [[ "$EVENT_SETTLE_SECONDS" =~ ^[0-9]+$ && "$EVENT_SETTLE_SECONDS" -le 30 ]] || die "EVENT_SETTLE_SECONDS must be 0..30"
+    [[ "$SUPERGFX_TIMEOUT_SECONDS" =~ ^[0-9]+$ && "$SUPERGFX_TIMEOUT_SECONDS" -ge 1 && "$SUPERGFX_TIMEOUT_SECONDS" -le 30 ]] || die "SUPERGFX_TIMEOUT_SECONDS must be 1..30"
+}
+
+find_battery ()
+{
+    local battery
+
+    for battery in "$SYS_ROOT"/class/power_supply/BAT*
+    do
+        [[ -d "$battery" ]] && printf '%s\n' "$battery" && return 0
+    done
+
+    return 1
+}
+
+detect_power_source ()
+{
+    local supply type online battery status
+
+    for supply in "$SYS_ROOT"/class/power_supply/*
+    do
+        [[ -d "$supply" ]] || continue
+        type=$(read_value "$supply/type" 2>/dev/null || true)
+
+        case "$type" in
+            Mains|USB|USB_C|USB_PD)
+                online=$(read_value "$supply/online" 2>/dev/null || true)
+                [[ "$online" == "1" ]] && printf 'ac\n' && return 0
+                ;;
+        esac
+    done
+
+    battery=$(find_battery 2>/dev/null || true)
+    if [[ -n "$battery" ]]
+    then
+        status=$(read_value "$battery/status" 2>/dev/null || true)
+        case "$status" in
+            Charging|Full|Not\ charging)
+                printf 'ac\n'
+                return 0
+                ;;
+            Discharging)
+                printf 'battery\n'
+                return 0
+                ;;
+        esac
+    fi
+
+    printf 'unknown\n'
+}
+
+supergfx_query ()
+{
+    local flag=$1 output
+
+    command -v supergfxctl >/dev/null 2>&1 || { printf 'unavailable\n'; return 1; }
+    output=$(timeout "${SUPERGFX_TIMEOUT_SECONDS}s" supergfxctl "$flag" 2>/dev/null) || {
+        printf 'timeout/error\n'
+        return 1
+    }
+    [[ -n "$output" ]] || output="unknown"
+    printf '%s\n' "$output"
+}
+
+first_cpu_value ()
+{
+    local suffix=$1 path
+
+    for path in "$SYS_ROOT"/devices/system/cpu/cpu*/cpufreq/"$suffix"
+    do
+        read_value "$path" 2>/dev/null && return 0
+    done
+
+    return 1
+}
+
+boost_value ()
+{
+    local path value
+
+    for path in \
+        "$SYS_ROOT/devices/system/cpu/cpufreq/boost" \
+        "$SYS_ROOT/devices/system/cpu/amd_pstate/cpb_boost" \
+        "$SYS_ROOT"/devices/system/cpu/cpu*/cpufreq/boost
+    do
+        [[ -r "$path" ]] || continue
+        value=$(read_value "$path" 2>/dev/null || true)
+        [[ "$value" == "1" ]] && printf 'on\n' || printf 'off\n'
+        return 0
+    done
+
+    printf 'unsupported\n'
+}
+
+battery_power ()
+{
+    local battery=$1 power current voltage
+
+    if [[ -r "$battery/power_now" ]]
+    then
+        power=$(read_value "$battery/power_now")
+        awk -v value="$power" 'BEGIN { printf "%.2f W", value / 1000000 }'
+        return 0
+    fi
+
+    if [[ -r "$battery/current_now" && -r "$battery/voltage_now" ]]
+    then
+        current=$(read_value "$battery/current_now")
+        voltage=$(read_value "$battery/voltage_now")
+        awk -v current="$current" -v voltage="$voltage" 'BEGIN { printf "%.2f W", (current * voltage) / 1000000000000 }'
+        return 0
+    fi
+
+    printf 'unknown'
+}
+
+battery_health ()
+{
+    local battery=$1 full design
+
+    if [[ -r "$battery/energy_full" && -r "$battery/energy_full_design" ]]
+    then
+        full=$(read_value "$battery/energy_full")
+        design=$(read_value "$battery/energy_full_design")
+    elif [[ -r "$battery/charge_full" && -r "$battery/charge_full_design" ]]
+    then
+        full=$(read_value "$battery/charge_full")
+        design=$(read_value "$battery/charge_full_design")
+    else
+        printf 'unknown'
+        return 0
+    fi
+
+    awk -v full="$full" -v design="$design" 'BEGIN { if (design > 0) printf "%.0f%%", full * 100 / design; else printf "unknown" }'
+}
+
+brightness_value ()
+{
+    local backlight max current
+
+    for backlight in "$SYS_ROOT"/class/backlight/*
+    do
+        [[ -d "$backlight" ]] || continue
+        max=$(read_value "$backlight/max_brightness" 2>/dev/null || true)
+        current=$(read_value "$backlight/actual_brightness" 2>/dev/null || read_value "$backlight/brightness" 2>/dev/null || true)
+        [[ "$max" =~ ^[0-9]+$ && "$max" -gt 0 && "$current" =~ ^[0-9]+$ ]] || continue
+        awk -v current="$current" -v max="$max" 'BEGIN { printf "%.0f%%", current * 100 / max }'
+        return 0
+    done
+
+    printf 'unknown'
+}
+
+charge_limit_value ()
+{
+    local battery limit
+
+    battery=$(find_battery 2>/dev/null || true)
+    [[ -n "$battery" ]] || { printf 'unknown'; return 0; }
+    limit=$(read_value "$battery/charge_control_end_threshold" 2>/dev/null || true)
+    [[ -n "$limit" ]] && printf '%s%%' "$limit" || printf 'unsupported'
+}
+
+state_value ()
+{
+    local key=$1
+
+    [[ -r "$STATE_FILE" ]] || return 1
+    awk -F= -v key="$key" '$1 == key { sub(/^[^=]*=/, ""); print; exit }' "$STATE_FILE"
+}
+
+gpu_power_value ()
+{
+    local status gate pci runtime
+
+    status=$(supergfx_query -S 2>/dev/null || true)
+    if [[ -n "$status" && "$status" != "unavailable" && "$status" != "timeout/error" ]]
+    then
+        printf '%s\n' "$status"
+        return 0
+    fi
+
+    gate="$SYS_ROOT/devices/platform/asus-nb-wmi/dgpu_disable"
+    if [[ -r "$gate" && "$(read_value "$gate")" == "1" ]]
+    then
+        printf 'off\n'
+        return 0
+    fi
+
+    if command -v lspci >/dev/null 2>&1
+    then
+        pci=$(lspci -D 2>/dev/null | awk 'tolower($0) ~ /nvidia/ && tolower($0) ~ /(vga|3d)/ { print $1; exit }')
+        if [[ -z "$pci" ]]
+        then
+            printf 'off/not enumerated\n'
+            return 0
+        fi
+        runtime="$SYS_ROOT/bus/pci/devices/$pci/power/runtime_status"
+        [[ -r "$runtime" ]] && read_value "$runtime" && return 0
+    fi
+
+    printf 'unknown\n'
+}
+
+status_cmd ()
+{
+    local source battery battery_text cpu_profile governor epp boost
+    local gpu_mode gpu_power pending_mode pending_action applied auto_status brightness limit
+
+    header status
+    source=$(detect_power_source)
+    battery=$(find_battery 2>/dev/null || true)
+
+    if [[ -n "$battery" ]]
+    then
+        battery_text="$(read_value "$battery/status" 2>/dev/null || printf 'unknown') · $(read_value "$battery/capacity" 2>/dev/null || printf '?')% · $(battery_power "$battery") · health $(battery_health "$battery")"
+    else
+        battery_text="not detected"
+    fi
+
+    if command -v powerprofilesctl >/dev/null 2>&1
+    then
+        cpu_profile=$(powerprofilesctl get 2>/dev/null || printf 'error')
+    else
+        cpu_profile="unmanaged"
+    fi
+    governor=$(first_cpu_value scaling_governor 2>/dev/null || printf 'unknown')
+    epp=$(first_cpu_value energy_performance_preference 2>/dev/null || printf 'unsupported')
+    boost=$(boost_value)
+
+    gpu_mode=$(supergfx_query -g 2>/dev/null || true)
+    gpu_power=$(gpu_power_value)
+    pending_mode=$(supergfx_query -P 2>/dev/null || true)
+    pending_action=$(supergfx_query -p 2>/dev/null || true)
+    applied=$(state_value profile 2>/dev/null || printf 'not applied')
+    brightness=$(brightness_value)
+    limit=$(charge_limit_value)
+
+    auto_status=$(systemctl is-enabled g14-power-auto.service 2>/dev/null || true)
+    is_one_of "$auto_status" enabled enabled-runtime linked linked-runtime || auto_status="disabled"
+
+    row power "$source · $battery_text"
+    row profile "$applied · platform $cpu_profile"
+    row cpu "governor $governor · EPP $epp · boost $boost"
+    row gpu "$gpu_mode · power $gpu_power"
+    row pending "$pending_mode · $pending_action"
+    row display "$brightness · charge limit $limit"
+    row auto "$auto_status"
+
+    printf '\n'
+    if [[ "$source" == "battery" && "$gpu_power" =~ ^(active|ACTIVE)$ ]]
+    then
+        warn "NVIDIA is active on battery; run: g14-power doctor"
+    elif [[ "$gpu_mode" == "timeout/error" ]]
+    then
+        warn "supergfxd did not answer; run: sudo g14-power repair"
+    else
+        ok "power state collected without waking the NVIDIA GPU"
+    fi
+}
+
+write_sysfs ()
+{
+    local value=$1 path=$2
+
+    [[ -e "$path" ]] || return 0
+    if (( DRY_RUN ))
+    then
+        info "would write $value → $path"
+        return 0
+    fi
+    printf '%s\n' "$value" > "$path" 2>/dev/null || {
+        warn "could not write $path"
+        return 1
+    }
+}
+
+apply_cpu_profile ()
+{
+    local profile=$1 governor epp path output
+
+    if command -v powerprofilesctl >/dev/null 2>&1
+    then
+        if (( DRY_RUN ))
+        then
+            info "would set platform profile to $profile"
+            return 0
+        fi
+        output=$(powerprofilesctl set "$profile" 2>&1) || {
+            warn "powerprofilesctl rejected $profile: $output"
+            return 1
+        }
+        ok "platform profile $profile"
+        return 0
+    fi
+
+    warn "powerprofilesctl is missing; using the AMD sysfs fallback"
+    case "$profile" in
+        power-saver) governor="powersave"; epp="power" ;;
+        balanced) governor="powersave"; epp="balance_performance" ;;
+        performance) governor="performance"; epp="performance" ;;
+    esac
+
+    for path in "$SYS_ROOT"/devices/system/cpu/cpu*/cpufreq/scaling_governor
+    do
+        write_sysfs "$governor" "$path"
+    done
+    for path in "$SYS_ROOT"/devices/system/cpu/cpu*/cpufreq/energy_performance_preference
+    do
+        write_sysfs "$epp" "$path"
+    done
+    ok "CPU fallback $governor · EPP $epp"
+}
+
+apply_boost ()
+{
+    local value=$1 path count=0 rc=0
+
+    for path in \
+        "$SYS_ROOT/devices/system/cpu/cpufreq/boost" \
+        "$SYS_ROOT/devices/system/cpu/amd_pstate/cpb_boost"
+    do
+        [[ -e "$path" ]] || continue
+        (( count += 1 ))
+        write_sysfs "$value" "$path" || rc=1
+    done
+
+    if (( count == 0 ))
+    then
+        warn "CPU boost is managed by the platform profile"
+        return 0
+    fi
+
+    [[ "$value" == "1" ]] && ok "CPU boost enabled" || ok "CPU boost disabled"
+    return "$rc"
+}
+
+apply_audio_power_save ()
+{
+    local value=$1 path="$SYS_ROOT/module/snd_hda_intel/parameters/power_save"
+
+    [[ -e "$path" ]] || return 0
+    write_sysfs "$value" "$path" || return 1
+    [[ "$value" == "1" ]] && ok "audio power saving enabled" || ok "audio power saving disabled"
+}
+
+pending_is_clear ()
+{
+    local value=${1,,}
+    [[ -z "$value" || "$value" == "unknown" || "$value" == *"no action"* || "$value" == *"none"* ]]
+}
+
+apply_gpu_mode ()
+{
+    local target=$1 current pending output rc
+
+    if [[ "$GPU_AUTO_SWITCH" == "0" || "$target" == "Keep" ]]
+    then
+        info "GPU mode left unchanged by policy"
+        return 0
+    fi
+    command -v supergfxctl >/dev/null 2>&1 || { warn "supergfxctl is missing; GPU mode unchanged"; return 1; }
+
+    current=$(supergfx_query -g 2>/dev/null || true)
+    pending=$(supergfx_query -P 2>/dev/null || true)
+
+    if [[ "$current" == "$target" ]] && pending_is_clear "$pending"
+    then
+        ok "GPU mode $target"
+        return 0
+    fi
+
+    if ! pending_is_clear "$pending" && [[ "$pending" == *"$target"* ]]
+    then
+        warn "GPU mode $target is already pending; finish the requested logout/reboot"
+        return 0
+    fi
+
+    if (( DRY_RUN ))
+    then
+        info "would request GPU mode $target"
+        return 0
+    fi
+
+    set +e
+    output=$(timeout 30s supergfxctl --mode "$target" 2>&1)
+    rc=$?
+    set -e
+    if (( rc != 0 ))
+    then
+        warn "GPU switch failed: ${output:-no response}"
+        return 1
+    fi
+
+    ok "GPU mode requested: $target"
+    [[ -n "$output" ]] && info "$output"
+}
+
+write_state ()
+{
+    local profile=$1 source=$2 gpu=$3 temporary
+
+    (( DRY_RUN )) && return 0
+    mkdir -p "$STATE_DIR"
+    temporary="$STATE_FILE.$$"
+    {
+        printf 'profile=%s\n' "$profile"
+        printf 'source=%s\n' "$source"
+        printf 'gpu_target=%s\n' "$gpu"
+        printf 'applied_at=%s\n' "$(date --iso-8601=seconds)"
+    } > "$temporary"
+    chmod 0644 "$temporary"
+    mv -f "$temporary" "$STATE_FILE"
+}
+
+lock_policy ()
+{
+    if (( DRY_RUN ))
+    then
+        return 0
+    fi
+
+    mkdir -p "$STATE_DIR"
+    exec 9> "$LOCK_FILE"
+    flock -w 20 9 || die "another power transition is still running"
+}
+
+apply_profile ()
+{
+    local profile=$1 source=${2:-manual} cpu gpu boost audio started elapsed rc=0
+
+    case "$profile" in
+        battery)
+            cpu=$BATTERY_CPU_PROFILE
+            gpu=$BATTERY_GPU_MODE
+            boost=$BATTERY_BOOST
+            audio=$BATTERY_AUDIO_POWER_SAVE
+            ;;
+        balanced)
+            cpu=$BALANCED_CPU_PROFILE
+            gpu=$BALANCED_GPU_MODE
+            boost=$BALANCED_BOOST
+            audio=$BALANCED_AUDIO_POWER_SAVE
+            ;;
+        gaming)
+            cpu=$GAMING_CPU_PROFILE
+            gpu=$GAMING_GPU_MODE
+            boost=$GAMING_BOOST
+            audio=$GAMING_AUDIO_POWER_SAVE
+            ;;
+        *) die "unknown profile: $profile" ;;
+    esac
+
+    started=$(date +%s%3N)
+    header "$profile"
+    info "resolved $source → $profile"
+    lock_policy
+
+    apply_cpu_profile "$cpu" || rc=1
+    apply_boost "$boost" || rc=1
+    apply_audio_power_save "$audio" || rc=1
+    apply_gpu_mode "$gpu" || rc=1
+    write_state "$profile" "$source" "$gpu"
+
+    elapsed=$(( $(date +%s%3N) - started ))
+    printf '\n'
+    if (( rc == 0 ))
+    then
+        ok "applied in ${elapsed}ms"
+    else
+        warn "profile applied with warnings in ${elapsed}ms"
+    fi
+    return "$rc"
+}
+
+auto_cmd ()
+{
+    local source profile
+
+    if (( SERVICE_MODE ))
+    then
+        sleep "$EVENT_SETTLE_SECONDS"
+    fi
+    source=$(detect_power_source)
+    case "$source" in
+        battery) profile=$AUTO_BATTERY_PROFILE ;;
+        ac) profile=$AUTO_AC_PROFILE ;;
+        *) die "could not determine whether AC power is connected" ;;
+    esac
+    apply_profile "$profile" "$source"
+}
+
+legacy_paths ()
+{
+    printf '%s\n' \
+        /usr/local/bin/g14_power_auto.sh \
+        /usr/local/bin/g14_mobile_mode.sh \
+        /etc/systemd/system/g14-battery-saver.service \
+        /etc/udev/rules.d/99-g14-power-auto.rules \
+        /etc/tmpfiles.d/g14-dgpu-off.conf
+}
+
+BACKUP_DIR=""
+BACKUP_COUNT=0
+
+backup_and_remove ()
+{
+    local path=$1 destination
+
+    [[ -e "$path" || -L "$path" ]] || return 0
+    if [[ -z "$BACKUP_DIR" ]]
+    then
+        BACKUP_DIR="/var/lib/g14-power/backups/$(date +%Y%m%d-%H%M%S)"
+    fi
+    destination="$BACKUP_DIR$path"
+    run mkdir -p "$(dirname "$destination")"
+    run cp -a "$path" "$destination"
+    run rm -f "$path"
+    (( BACKUP_COUNT += 1 ))
+}
+
+cleanup_legacy ()
+{
+    local path
+
+    systemctl disable --now g14-battery-saver.service >/dev/null 2>&1 || true
+    while IFS= read -r path
+    do
+        backup_and_remove "$path"
+    done < <(legacy_paths)
+
+    if (( BACKUP_COUNT > 0 ))
+    then
+        ok "migrated $BACKUP_COUNT legacy files to $BACKUP_DIR"
+    else
+        ok "no legacy installed files found"
+    fi
+}
+
+write_default_config ()
+{
+    local destination=$1
+
+    mkdir -p "$(dirname "$destination")"
+    cat > "$destination" <<'CONFIG'
+# g14-power policy
+# Hybrid <-> Integrated normally requires a graphical logout.
+# Use Keep to leave a GPU mode unchanged for a profile.
+BATTERY_CPU_PROFILE="power-saver"
+BALANCED_CPU_PROFILE="balanced"
+GAMING_CPU_PROFILE="performance"
+
+BATTERY_GPU_MODE="Integrated"
+BALANCED_GPU_MODE="Hybrid"
+GAMING_GPU_MODE="Hybrid"
+GPU_AUTO_SWITCH=1
+
+BATTERY_BOOST=0
+BALANCED_BOOST=1
+GAMING_BOOST=1
+
+BATTERY_AUDIO_POWER_SAVE=1
+BALANCED_AUDIO_POWER_SAVE=1
+GAMING_AUDIO_POWER_SAVE=0
+
+AUTO_BATTERY_PROFILE="battery"
+AUTO_AC_PROFILE="balanced"
+EVENT_SETTLE_SECONDS=2
+SUPERGFX_TIMEOUT_SECONDS=4
+CONFIG
+    chmod 0644 "$destination"
+}
+
+write_supergfxd_default ()
+{
+    cat > /etc/supergfxd.conf <<'JSON'
+{
+  "mode": "Hybrid",
+  "vfio_enable": false,
+  "vfio_save": false,
+  "always_reboot": false,
+  "no_logind": false,
+  "logout_timeout_s": 180,
+  "hotplug_type": "None"
+}
+JSON
+    chmod 0644 /etc/supergfxd.conf
+}
+
+reset_supergfxd ()
+{
+    backup_and_remove /etc/supergfxd.conf
+    write_supergfxd_default
+    systemctl reset-failed supergfxd.service >/dev/null 2>&1 || true
+    systemctl restart supergfxd.service
+    ok "reset broken supergfxd configuration"
+}
+
+repair_supergfxd_if_needed ()
+{
+    command -v supergfxctl >/dev/null 2>&1 || { warn "supergfxctl is not installed"; return 0; }
+    systemctl reset-failed supergfxd.service >/dev/null 2>&1 || true
+    systemctl restart supergfxd.service >/dev/null 2>&1 || true
+
+    if systemctl is-active --quiet supergfxd.service && timeout 5s supergfxctl -g >/dev/null 2>&1
+    then
+        ok "supergfxd is responsive"
+        return 0
+    fi
+
+    warn "supergfxd is broken after restart; restoring a clean documented config"
+    reset_supergfxd
+}
+
+install_units ()
+{
+    cat > /etc/systemd/system/g14-power-auto.service <<'UNIT'
+[Unit]
+Description=Apply the G14 power policy
+After=power-profiles-daemon.service supergfxd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/g14-power auto --service
+TimeoutStartSec=60
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
+    cat > /etc/udev/rules.d/90-g14-power.rules <<'RULE'
+# Queue work in systemd; never perform a GPU transition inside udevd.
+ACTION=="change", SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_ONLINE}=="0", RUN+="/usr/bin/systemctl --no-block restart g14-power-auto.service"
+ACTION=="change", SUBSYSTEM=="power_supply", ENV{POWER_SUPPLY_ONLINE}=="1", RUN+="/usr/bin/systemctl --no-block restart g14-power-auto.service"
+RULE
+
+    chmod 0644 /etc/systemd/system/g14-power-auto.service /etc/udev/rules.d/90-g14-power.rules
+}
+
+install_cmd ()
+{
+    require_root install
+    header install
+    cleanup_legacy
+
+    install -Dm755 "$SELF" /usr/local/bin/g14-power
+    [[ -e /etc/g14-power.conf ]] || write_default_config /etc/g14-power.conf
+    install_units
+
+    systemctl daemon-reload
+    udevadm control --reload-rules
+
+    if systemctl list-unit-files power-profiles-daemon.service --no-legend 2>/dev/null | grep -q power-profiles-daemon
+    then
+        systemctl enable --now power-profiles-daemon.service >/dev/null
+        ok "power-profiles-daemon enabled"
+    else
+        warn "install power-profiles-daemon: sudo pacman -S power-profiles-daemon"
+    fi
+
+    if systemctl list-unit-files supergfxd.service --no-legend 2>/dev/null | grep -q supergfxd
+    then
+        systemctl enable supergfxd.service >/dev/null 2>&1 || true
+        repair_supergfxd_if_needed
+    else
+        warn "install supergfxctl from the supported ASUS/CachyOS package source"
+    fi
+
+    systemctl enable g14-power-auto.service >/dev/null
+    systemctl start g14-power-auto.service || true
+
+    printf '\n'
+    ok "installed /usr/local/bin/g14-power"
+    info "run: g14-power status"
+    info "then: g14-power doctor"
+    if [[ -n "$BACKUP_DIR" ]]
+    then
+        info "legacy backup: $BACKUP_DIR"
+    fi
+}
+
+uninstall_cmd ()
+{
+    local purge=${1:-}
+
+    require_root uninstall "$purge"
+    header uninstall
+    systemctl disable --now g14-power-auto.service >/dev/null 2>&1 || true
+    rm -f /etc/systemd/system/g14-power-auto.service /etc/udev/rules.d/90-g14-power.rules
+    systemctl daemon-reload
+    udevadm control --reload-rules
+    rm -f /usr/local/bin/g14-power
+
+    if [[ "$purge" == "--purge" ]]
+    then
+        rm -f /etc/g14-power.conf
+        ok "removed program, policy, service, and udev rule"
+    else
+        ok "removed program, service, and udev rule"
+        info "kept /etc/g14-power.conf; pass --purge to remove it"
+    fi
+}
+
+repair_cmd ()
+{
+    local reset=${1:-}
+
+    require_root repair "$reset"
+    header repair
+    cleanup_legacy
+    rm -f /etc/udev/rules.d/99-g14-power-auto.rules /etc/tmpfiles.d/g14-dgpu-off.conf
+
+    if [[ "$reset" == "--reset-supergfxd" ]]
+    then
+        reset_supergfxd
+    else
+        repair_supergfxd_if_needed
+    fi
+
+    systemctl daemon-reload
+    udevadm control --reload-rules
+    systemctl restart g14-power-auto.service || true
+    printf '\n'
+    ok "repair completed without rebooting"
+    info "if a GPU mode is pending, log out once and log back in"
+}
+
+doctor_check ()
+{
+    local severity=$1 message=$2
+
+    case "$severity" in
+        ok) ok "$message" ;;
+        warn) warn "$message"; DOCTOR_WARNINGS=$(( DOCTOR_WARNINGS + 1 )) ;;
+        fail) fail "$message"; DOCTOR_ERRORS=$(( DOCTOR_ERRORS + 1 )) ;;
+    esac
+}
+
+nvidia_connectors ()
+{
+    local status connector card vendor
+
+    for status in "$SYS_ROOT"/class/drm/card*-*/status
+    do
+        [[ -r "$status" ]] || continue
+        [[ "$(read_value "$status")" == "connected" ]] || continue
+        connector=${status%/status}
+        card=${connector##*/}
+        card=${card%%-*}
+        vendor=$(read_value "$SYS_ROOT/class/drm/$card/device/vendor" 2>/dev/null || true)
+        [[ "${vendor,,}" == "0x10de" ]] && printf '%s\n' "${connector##*/}"
+    done
+}
+
+DOCTOR_WARNINGS=0
+DOCTOR_ERRORS=0
+
+doctor_cmd ()
+{
+    local path service mode power pending action connectors
+
+    header doctor
+    info "checking ownership, daemons, pending switches, and GPU blockers"
+
+    if command -v powerprofilesctl >/dev/null 2>&1
+    then
+        doctor_check ok "powerprofilesctl is installed"
+    else
+        doctor_check fail "powerprofilesctl missing: sudo pacman -S power-profiles-daemon"
+    fi
+
+    if command -v supergfxctl >/dev/null 2>&1
+    then
+        doctor_check ok "supergfxctl is installed"
+    else
+        doctor_check fail "supergfxctl is missing"
+    fi
+
+    if systemctl is-active --quiet supergfxd.service
+    then
+        doctor_check ok "supergfxd is active"
+    else
+        doctor_check fail "supergfxd is not active; run sudo g14-power repair"
+    fi
+
+    while IFS= read -r path
+    do
+        [[ -e "$path" ]] && doctor_check fail "legacy conflict exists: $path"
+    done < <(legacy_paths)
+
+    for service in tlp.service auto-cpufreq.service tuned.service optimus-manager.service system76-power.service
+    do
+        if systemctl is-active --quiet "$service" 2>/dev/null
+        then
+            doctor_check warn "$service is active and may compete with this policy"
+        fi
+    done
+
+    mode=$(supergfx_query -g 2>/dev/null || true)
+    power=$(gpu_power_value)
+    pending=$(supergfx_query -P 2>/dev/null || true)
+    action=$(supergfx_query -p 2>/dev/null || true)
+    [[ "$mode" == "timeout/error" ]] && doctor_check fail "supergfxctl timed out" || doctor_check ok "GPU mode: $mode"
+    [[ "${power,,}" == "active" && "$(detect_power_source)" == "battery" ]] \
+        && doctor_check warn "NVIDIA is active on battery" \
+        || doctor_check ok "GPU power: $power"
+    pending_is_clear "$pending" \
+        && doctor_check ok "no GPU mode change is pending" \
+        || doctor_check warn "pending GPU mode: $pending"
+    pending_is_clear "$action" \
+        && doctor_check ok "no user action is pending" \
+        || doctor_check warn "required GPU action: $action"
+
+    connectors=$(nvidia_connectors || true)
+    if [[ -n "$connectors" ]]
+    then
+        doctor_check warn "display connector on NVIDIA: ${connectors//$'\n'/, }"
+    fi
+
+    if systemctl is-active --quiet nvidia-persistenced.service 2>/dev/null
+    then
+        doctor_check warn "nvidia-persistenced is active and can keep the GPU awake"
+    fi
+
+    if compgen -G '/dev/nvidia*' >/dev/null && command -v fuser >/dev/null 2>&1
+    then
+        if fuser /dev/nvidia* >/dev/null 2>&1
+        then
+            doctor_check warn "a process has /dev/nvidia* open; inspect with: sudo fuser -v /dev/nvidia*"
+        fi
+    fi
+
+    if grep -Rqs -- 'NVreg_DynamicPowerManagement=0x02' /etc/modprobe.d /usr/lib/modprobe.d 2>/dev/null
+    then
+        doctor_check ok "NVIDIA fine-grained runtime power management is configured"
+    else
+        doctor_check warn "NVIDIA runtime D3 option was not found (useful while in Hybrid mode)"
+    fi
+
+    printf '\n'
+    if (( DOCTOR_ERRORS == 0 && DOCTOR_WARNINGS == 0 ))
+    then
+        ok "all checks passed"
+    else
+        info "$DOCTOR_ERRORS errors · $DOCTOR_WARNINGS warnings"
+    fi
+
+    (( DOCTOR_ERRORS == 0 ))
+}
+
+event_cmd ()
+{
+    # This is intentionally tiny: udev only queues work in systemd.
+    systemctl --no-block restart g14-power-auto.service
+}
+
+gpu_cmd ()
+{
+    local target=${1:-}
+
+    case "${target,,}" in
+        integrated) target="Integrated" ;;
+        hybrid) target="Hybrid" ;;
+        *) die "usage: g14-power gpu integrated|hybrid" ;;
+    esac
+    require_root gpu "$1"
+    header "gpu $target"
+    lock_policy
+    apply_gpu_mode "$target"
+}
+
+print_help ()
+{
+    cat <<'HELP'
+g14-power — one power policy for an ASUS G14
+
+Usage:
+  g14-power                    Show the Bun-style status view
+  g14-power status             Show battery, CPU, GPU, and pending actions
+  g14-power doctor             Find conflicting services and GPU blockers
+  g14-power auto               Apply battery/AC policy automatically
+  g14-power battery            Apply the portable profile
+  g14-power balanced           Apply the everyday AC profile
+  g14-power gaming             Apply the performance profile
+  g14-power gpu integrated     Request hard dGPU-off mode
+  g14-power gpu hybrid         Make the dGPU available for offload
+  g14-power install            Migrate legacy files and install automation
+  g14-power repair             Clear legacy conflicts and restart supergfxd
+  g14-power repair --reset-supergfxd
+                               Back up and reset a broken supergfxd config
+  g14-power uninstall [--purge]
+
+Options:
+  --dry-run                    Print changes without applying them
+  --no-color                   Disable ANSI colors
+  -h, --help                   Show this help
+  -v, --version                Show the version
+
+Policy:
+  Edit /etc/g14-power.conf after installation. Switching between Hybrid and
+  Integrated commonly needs one graphical logout; the status view shows the
+  pending mode and action instead of pretending the switch finished.
+HELP
+}
+
+main ()
+{
+    local command="status" command_seen=0 args=()
+
+    while (( $# > 0 ))
+    do
+        case "$1" in
+            --dry-run) DRY_RUN=1 ;;
+            --service) SERVICE_MODE=1 ;;
+            --no-color) C_RESET=""; C_BOLD=""; C_DIM=""; C_GREEN=""; C_YELLOW=""; C_RED=""; C_CYAN="" ;;
+            -h|--help) print_help; return 0 ;;
+            -v|--version) printf '%s %s\n' "$PROGRAM" "$VERSION"; return 0 ;;
+            status|doctor|auto|battery|balanced|gaming|gpu|install|uninstall|repair|event)
+                (( command_seen == 0 )) || die "multiple commands supplied"
+                command=$1
+                command_seen=1
+                ;;
+            *) args+=("$1") ;;
+        esac
+        shift
+    done
+
+    if (( DRY_RUN )) && is_one_of "$command" install uninstall repair event
+    then
+        die "--dry-run is supported for auto, battery, balanced, gaming, and gpu"
+    fi
+
+    case "$command" in
+        status|doctor|auto|battery|balanced|gaming|install|event)
+            (( ${#args[@]} == 0 )) || die "$command does not accept positional arguments"
+            ;;
+        gpu)
+            (( ${#args[@]} == 1 )) || die "usage: g14-power gpu integrated|hybrid"
+            ;;
+        uninstall)
+            (( ${#args[@]} <= 1 )) || die "usage: g14-power uninstall [--purge]"
+            [[ ${#args[@]} == 0 || "${args[0]}" == "--purge" ]] || die "usage: g14-power uninstall [--purge]"
+            ;;
+        repair)
+            (( ${#args[@]} <= 1 )) || die "usage: g14-power repair [--reset-supergfxd]"
+            [[ ${#args[@]} == 0 || "${args[0]}" == "--reset-supergfxd" ]] || die "usage: g14-power repair [--reset-supergfxd]"
+            ;;
+    esac
+
+    load_config
+    case "$command" in
+        status) status_cmd ;;
+        doctor) doctor_cmd ;;
+        auto) require_root auto "${args[@]}"; auto_cmd ;;
+        battery|balanced|gaming) require_root "$command" "${args[@]}"; apply_profile "$command" manual ;;
+        gpu) gpu_cmd "${args[@]}" ;;
+        install) install_cmd "${args[@]}" ;;
+        uninstall) uninstall_cmd "${args[@]}" ;;
+        repair) repair_cmd "${args[@]}" ;;
+        event) event_cmd ;;
+    esac
+}
+
+main "$@"
