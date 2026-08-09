@@ -30,6 +30,7 @@ typeset -U path  # -U ensures unique entries (no duplicates)
 path=(
     "$HOME/Dotfiles/bin"
     "$HOME/.local/bin"
+    "$HOME/Library/Python/3.14/bin"
     "$HOME/.local/share/nvim/mason/bin"
     "$HOME/.npm-global/bin"
     "/opt/homebrew/opt/openjdk/bin"
@@ -92,6 +93,9 @@ alias schd='open /Users/callo/College/Schedule/Y2T3/image.png'
 
 # --- 6. Custom Functions ------------------------------------------------------
 
+# Export a percent-format .py to .ipynb  (vim's % means "current file"; in shell, pass it explicitly)
+jupy() { jupytext "${1:?usage: jupy <file.py>}" --to notebook }
+
 # Initialize a Java Gradle project
 ginit() {
     local project_name=$1
@@ -130,3 +134,33 @@ export PATH="/opt/homebrew/opt/ffmpeg-full/bin:$PATH"
 
 
 [ -f "/Users/callo/.ghcup/env" ] && . "/Users/callo/.ghcup/env" # ghcup-env
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/callo/.local/bin:$PATH"
+alias nb-export='f() { .venv/bin/python -m nbconvert --to notebook --execute "$1" --output "$1" && .venv/bin/jupyter nbconvert --to webpdf "$1" }; f'
+nbinit() {
+  local name="${1:-$(basename $PWD)}"
+  uv venv .venv
+  if [[ -f requirements.txt ]]; then
+    uv pip install -r requirements.txt ipykernel
+  else
+    uv pip install ipykernel
+  fi
+  .venv/bin/python -m ipykernel install --user --name "$name"
+  echo "✓ kernel '$name' ready — :NotebookSetKernel $name"
+}
+
+# Register an existing .venv as a Jupyter kernel (for projects already set up)
+nbkernel() {
+  local name="${1:-$(basename $PWD)}"
+  uv pip install ipykernel
+  .venv/bin/python -m ipykernel install --user --name "$name" --display-name "$name"
+  echo "✓ kernel '$name' ready — :NotebookSetKernel $name"
+}
+
+# BloodDrive
+alias preflight="bun run nuke"
+export PATH="$HOME/.config/emacs/bin:$PATH"
+alias em="emacsclient -nw"
+alias emg="open -a Emacs"

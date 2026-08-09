@@ -13,6 +13,12 @@ spec.config = function()
     debounce_ms = 60,
     window = { width = 900, height = 1000 },
     position = { x = 40, y = 40 },
+    theme = {
+      preset = "tokyonight",
+      font = {
+        mono = "JetBrains Mono, monospace",
+      },
+    },
     keymaps = {
       open = "<leader>jo",
       close = "<leader>jc",
