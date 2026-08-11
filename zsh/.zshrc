@@ -21,6 +21,7 @@ export vblank_mode=0
 # --- 3. Path Configuration ---
 typeset -U path
 path=(
+    "$HOME/.cargo/bin"
     "$HOME/Dotfiles/bin"
     "$HOME/.local/bin"
     "$HOME/.local/share/nvim/mason/bin"
@@ -85,3 +86,12 @@ export BUN_INSTALL="$HOME/.bun"
 
 # bun completions
 [ -s "/home/amane/.bun/_bun" ] && source "/home/amane/.bun/_bun"
+
+alias preflight="bunx prisma generate && bun run check && bun run test && bun run build"
+
+# opencode
+export PATH=/home/amane/.opencode/bin:$PATH
+export JAVA_HOME=/usr/lib/jvm/java-26-openjdk
+
+# Organize Downloads on terminal startup
+"$HOME/.local/bin/organize-downloads" --quiet

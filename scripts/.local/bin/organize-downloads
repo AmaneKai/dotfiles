@@ -1,29 +1,57 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-DOWNLOADS_DIR="$HOME/Downloads"
+set -Eeuo pipefail
 
-organize_files() {
-    find "$DOWNLOADS_DIR" -maxdepth 1 -type f | while read -r file; do
-        filename=$(basename "$file")
-        
-        if [[ "$filename" == .* ]]; then
-            continue
-        fi
-        
-        if [[ "$filename" == *.* ]]; then
-            extension="${filename##*.}"
-            extension=$(echo "$extension" | tr '[:upper:]' '[:lower:]')
-        else
-            extension="no_extension"
-        fi
-        
-        target_dir="$DOWNLOADS_DIR/$extension"
-        if [[ ! -d "$target_dir" ]]; then
-            mkdir -p "$target_dir"
-        fi
-        
-        mv "$file" "$target_dir/"
-    done
+quiet=0
+[[ "${1:-}" == "--quiet" ]] && quiet=1
+
+if [[ -n "${ORGANIZE_DOWNLOADS_DIR:-}" ]]
+then
+    downloads_dir=$ORGANIZE_DOWNLOADS_DIR
+elif command -v xdg-user-dir >/dev/null 2>&1
+then
+    downloads_dir=$(xdg-user-dir DOWNLOAD)
+else
+    downloads_dir="$HOME/Downloads"
+fi
+
+[[ -n "$downloads_dir" && "$downloads_dir" != "/" ]] || {
+    printf 'organize-downloads: unsafe Downloads path\n' >&2
+    exit 1
 }
 
-organize_files
+runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
+lock_file="$runtime_dir/organize-downloads-$UID.lock"
+
+mkdir -p "$downloads_dir"
+exec 9> "$lock_file"
+flock -n 9 || exit 0
+
+moved=0
+while IFS= read -r -d '' file
+do
+    name=${file##*/}
+
+    if [[ "$name" == *.* && "$name" != *. ]]
+    then
+        extension=${name##*.}
+        extension=${extension,,}
+    else
+        extension="other"
+    fi
+
+    case "$extension" in
+        part|crdownload|download|tmp) continue ;;
+    esac
+
+    [[ "$extension" =~ ^[[:alnum:]]{1,24}$ ]] || extension="other"
+    destination="$downloads_dir/$extension"
+    mkdir -p "$destination"
+    mv --backup=numbered -- "$file" "$destination/"
+    (( moved += 1 ))
+done < <(find "$downloads_dir" -mindepth 1 -maxdepth 1 -type f -print0)
+
+if (( ! quiet && moved > 0 ))
+then
+    printf '✓ organized %d file(s) in %s\n' "$moved" "$downloads_dir"
+fi
