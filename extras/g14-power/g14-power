@@ -826,15 +826,20 @@ install_units ()
     cat > /etc/systemd/system/g14-power-auto.service <<'UNIT'
 [Unit]
 Description=Apply the G14 power policy
+# power-profiles-daemon ships After=multi-user.target WantedBy=graphical.target.
+# Order after it, and be wanted by the same target, or systemd finds an ordering
+# cycle (multi-user.target -> here -> p-p-d -> multi-user.target) and drops p-p-d.
+Wants=power-profiles-daemon.service
 After=power-profiles-daemon.service supergfxd.service
 
 [Service]
 Type=oneshot
+RemainAfterExit=yes
 ExecStart=/usr/local/bin/g14-power auto --service
 TimeoutStartSec=60
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=graphical.target
 UNIT
 
     cat > /etc/udev/rules.d/90-g14-power.rules <<'RULE'
@@ -875,8 +880,10 @@ install_cmd ()
         warn "install supergfxctl from the supported ASUS/CachyOS package source"
     fi
 
-    systemctl enable g14-power-auto.service >/dev/null
-    systemctl start g14-power-auto.service || true
+    # reenable, not enable: clears a stale multi-user.target.wants symlink from
+    # an older install so the [Install] target change actually takes effect.
+    systemctl reenable g14-power-auto.service >/dev/null 2>&1 || systemctl enable g14-power-auto.service >/dev/null
+    systemctl restart g14-power-auto.service || true
 
     printf '\n'
     ok "installed /usr/local/bin/g14-power"
@@ -990,6 +997,19 @@ doctor_cmd ()
         doctor_check ok "supergfxd is active"
     else
         doctor_check fail "supergfxd is not active; run sudo g14-power repair"
+    fi
+
+    if systemctl list-unit-files power-profiles-daemon.service --no-legend 2>/dev/null | grep -q power-profiles-daemon
+    then
+        if systemctl is-active --quiet power-profiles-daemon.service
+        then
+            doctor_check ok "power-profiles-daemon is active"
+        elif journalctl -b -u systemd --no-pager 2>/dev/null | grep -q "ordering cycle.*power-profiles-daemon"
+        then
+            doctor_check fail "power-profiles-daemon dropped by an ordering cycle; run: sudo g14-power install"
+        else
+            doctor_check fail "power-profiles-daemon is enabled but not active: systemctl status power-profiles-daemon"
+        fi
     fi
 
     while IFS= read -r path
