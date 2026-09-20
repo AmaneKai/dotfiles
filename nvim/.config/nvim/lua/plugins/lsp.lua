@@ -15,7 +15,7 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "clangd", "lua_ls", "tailwindcss", "html",
-          "vtsls", "gopls", "htmx", "rust_analyzer", "svelte", "eslint",
+          "vtsls", "rust_analyzer", "svelte", "eslint",
           "pyright",
         },
         handlers = {
