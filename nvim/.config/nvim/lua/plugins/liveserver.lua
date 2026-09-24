@@ -1,5 +1,5 @@
 return {
-  "barrett-ruth/live-server.nvim",
+  url = "https://forge.barrettruth.com/barrettruth/live-server.nvim",
   build = "npm install -g live-server",
   config = function()
     vim.g.live_server = {
@@ -11,8 +11,6 @@ return {
     vim.keymap.set("n", "<leader>ls", ":LiveServerStart<CR>", { desc = "Start Live Server" })
     vim.keymap.set("n", "<leader>lc", ":LiveServerStop<CR>",  { desc = "Stop Live Server" })
 
-    -- Auto-save ensures the file on disk is current when switching buffers;
-    -- live-server picks up the write and hot-reloads the browser
     vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "InsertLeave" }, {
       pattern  = { "*.html", "*.css", "*.js" },
       callback = function() vim.cmd("silent! write") end,
