@@ -12,3 +12,7 @@ window-padding-x = 10
 window-padding-y = 10
 # appearance
 cursor-style = block
+
+keybind = ctrl+Equal=increase_font_size:1
+keybind = ctrl+Minus=decrease_font_size:1
+keybind = ctrl+Digit0=reset_font_size

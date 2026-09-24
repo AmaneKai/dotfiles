@@ -95,3 +95,4 @@ export JAVA_HOME=/usr/lib/jvm/java-26-openjdk
 
 # Organize Downloads on terminal startup
 "$HOME/.local/bin/organize-downloads" --quiet
+. "/home/amane/.deno/env"
