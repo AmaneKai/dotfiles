@@ -17,7 +17,7 @@ i3 (X11) desktop, shell, and editor configs for Arch, Fedora, and the Debian fam
 | i3lock | lock screen script | `~/bin/lock.sh` |
 | nmdmenu | networkmanager-dmenu | `~/.config/networkmanager-dmenu/config.ini` |
 | nvim | Neovim | `~/.config/nvim/` |
-| picom | compositor: vsync, shadows, fades | `~/.config/picom/picom.conf` |
+| picom | optional compositor config, not started by i3 | `~/.config/picom/picom.conf` |
 | polybar | status bar | `~/.config/polybar/` |
 | rofi | launcher theme | `~/.config/rofi/` |
 | scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore | `~/.local/bin/` |

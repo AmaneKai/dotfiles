@@ -43,7 +43,7 @@ sudo pacman -S --needed pipewire pipewire-pulse wireplumber libpulse
 i3:
 
 ```bash
-sudo pacman -S --needed i3-wm feh autorandr util-linux autotiling dex dunst xss-lock wezterm pcmanfm rofi picom networkmanager networkmanager-dmenu maim xclip brightnessctl libnotify mpv bluez bluez-utils python python-pillow python-numpy papirus-icon-theme
+sudo pacman -S --needed i3-wm feh autorandr util-linux autotiling dex dunst xss-lock wezterm pcmanfm rofi networkmanager networkmanager-dmenu maim xclip brightnessctl libnotify mpv bluez bluez-utils python python-pillow python-numpy papirus-icon-theme
 ```
 
 polybar:
@@ -208,7 +208,6 @@ autorandr --save laptop
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
 | `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
-| `pgrep -a picom` | a running `picom -b` |
 | `readlink ~/.config/gtk-3.0/settings.ini` | `../../Dotfiles/gtk/.config/gtk-3.0/settings.ini` |
 | `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |

@@ -97,7 +97,7 @@ Do not install `pulseaudio` alongside `pipewire-pulse`. They conflict.
 
 | Tool | Used by | Where | Arch | Fedora | Debian family |
 | --- | --- | --- | --- | --- | --- |
-| picom | compositor, started by i3 | `picom/.config/picom/picom.conf`, `i3/.config/i3/config` | picom | picom | picom |
+| picom | optional compositor, not started by i3 (suspected of lagging Brave on the CF-SV7, unconfirmed) | `picom/.config/picom/picom.conf` | picom | picom | picom |
 | Rose Pine GTK theme `rose-pine-gtk` | GTK apps | `gtk/.config/gtk-3.0/settings.ini`, `gtk/.gtkrc-2.0` | rose-pine-gtk-theme (AUR) | manual | manual |
 | Rose Pine cursor `BreezeX-RosePine-Linux` | cursor | `gtk/.icons/default/index.theme`, `xresources/.Xresources` | rose-pine-cursor (AUR) | manual | manual |
 | Papirus icons `Papirus-Dark` | GTK icons, dunst | `gtk/.config/gtk-3.0/settings.ini`, `dunst/.config/dunst/dunstrc` | papirus-icon-theme | papirus-icon-theme | papirus-icon-theme |

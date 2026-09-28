@@ -41,4 +41,5 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | zsh and fish duplicate aliases and env | Different languages; no shared file format |
 | `fconv` and `git-purge` duplicate the `die`, `info`, `success` helpers | Scripts stay standalone and portable |
 | `discord/nocturnal-mod-old.theme.css` | Imports remote CSS from `xcruxiex.github.io` and `discordstyles.github.io`. Needed by the theme |
+| `picom/.config/picom/picom.conf` | Not started by i3. Suspected cause of extreme Brave lag on the CF-SV7 (`backend = "glx"`, `vsync = true`, Intel UHD 620); not confirmed, the lag also went away after a restart. Kept as an opt-in config |
 | i3 reload runs `polybar/launch.sh` (`exec_always`) | Running `launch.sh` by hand at the same moment can start two bars. Run it again to fix |

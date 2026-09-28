@@ -39,8 +39,8 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Screen tearing, no shadows | picom not installed or not running | Install picom, check `pgrep -a picom`, start it with `picom -b` |
-| Battery drains faster with picom | Compositing keeps the GPU busy | `pkill picom`. Fullscreen video already bypasses it (`unredir-if-possible`) |
+| Brave and video extremely laggy | Suspected: picom with the `glx` backend and vsync on the Intel UHD 620 (unconfirmed). Also possible: one heavy tab | `pkill picom`. In Brave press `Shift+Esc` to find the tab using the CPU. i3 does not start picom by default |
+| Screen tearing, no shadows | No compositor runs by default | Optional: install picom and run `picom -b`. It may have made Brave laggy on the CF-SV7 (unconfirmed); the `xrender` backend is untested |
 | Cursor still the default arrow | Cursor theme not installed, or X not restarted | Install the Rose Pine cursor, then log out and run `startx` again |
 | GTK apps not themed | `rose-pine-gtk` not installed | Install the theme; check `~/.config/gtk-3.0/settings.ini` is a link into the repo |
 | Volume or brightness keys show no popup | dunst not running | `pgrep dunst`; reload with `dunstctl reload` |

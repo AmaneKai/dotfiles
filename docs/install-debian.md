@@ -39,7 +39,7 @@ sudo apt install -y pipewire pipewire-pulse wireplumber pulseaudio-utils
 i3:
 
 ```bash
-sudo apt install -y i3-wm feh autorandr rfkill dex dunst xss-lock wezterm pcmanfm rofi picom network-manager maim xclip brightnessctl libnotify-bin mpv bluez python3 python3-pil python3-numpy papirus-icon-theme python3-gi gir1.2-nm-1.0 pipx
+sudo apt install -y i3-wm feh autorandr rfkill dex dunst xss-lock wezterm pcmanfm rofi network-manager maim xclip brightnessctl libnotify-bin mpv bluez python3 python3-pil python3-numpy papirus-icon-theme python3-gi gir1.2-nm-1.0 pipx
 sudo curl -fsSL -o /usr/local/bin/networkmanager_dmenu https://raw.githubusercontent.com/firecat53/networkmanager-dmenu/main/networkmanager_dmenu
 sudo chmod +x /usr/local/bin/networkmanager_dmenu
 ```
@@ -259,7 +259,6 @@ autorandr --save laptop
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
 | `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
-| `pgrep -a picom` | a running `picom -b` |
 | `readlink ~/.config/gtk-3.0/settings.ini` | `../../Dotfiles/gtk/.config/gtk-3.0/settings.ini` |
 | `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |
