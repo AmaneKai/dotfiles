@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+readonly LAUNCH_SCRIPT="$HOME/.config/polybar/launch.sh"
+
+[ ! -x "$LAUNCH_SCRIPT" ] && exit 1
+
+bash "$LAUNCH_SCRIPT"

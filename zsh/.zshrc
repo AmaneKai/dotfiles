@@ -45,10 +45,10 @@ bindkey -s '^f' 'tmux-sessionizer\n'
 alias vi="nvim"
 
 # Eza (Modern LS)
-alias ls="eza --icons"
-alias ll="eza -lg --icons"
-alias la="eza -lag --icons"
-alias l="eza --tree --git-ignore --icons --level=3 --group-directories-first"
+alias ls="eza --icons=auto"
+alias ll="eza -lg --icons=auto"
+alias la="eza -lag --icons=auto"
+alias l="eza --tree --git-ignore --icons=auto --level=3 --group-directories-first"
 
 # Dev Tools
 alias grun="./gradlew run -q --console=plain"
