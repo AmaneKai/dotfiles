@@ -190,7 +190,7 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | js-debug | JavaScript, TypeScript debugging | `lua/plugins/dap.lua` | manual | manual | manual |
 | netcoredbg | C# debugging | `lua/plugins/dap.lua` | manual | manual | manual |
 
-No LSP is configured. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`). debugpy, js-debug and netcoredbg use one install recipe on every distro (see Manual installs) so the paths in `dap.lua` match.
+No LSP is configured. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`). debugpy, js-debug and netcoredbg use one install recipe on every distro (see Manual installs) so the paths in `dap.lua` match. No plugin in this repo needs luarocks right now; lazy.nvim's `rocks` support (`lua/callo/lazy.lua`) is enabled by default, so a future plugin that ships a rockspec picks it up automatically. `:checkhealth lazy` reports "no plugins require luarocks" until one does.
 
 ## scripts package
 

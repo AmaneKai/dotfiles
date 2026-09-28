@@ -93,6 +93,7 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | Debug session starts and exits at once | Adapter not installed or not at the expected path | Check `gdb --version`, `dlv version`, `netcoredbg --version`, `ls ~/.local/share/nvim/js-debug/src/dapDebugServer.js`, `~/.local/share/nvim/debugpy/bin/python -c "import debugpy"` |
 | C, C++ or Rust breakpoints never hit | Binary built without debug info | Build with `-g` (C, C++) or a debug profile (`cargo build`) |
 | live-server build fails | `npm install -g` needs a writable prefix | `npm config set prefix ~/.npm-global` |
+| `<leader>md` or `<leader>ty` opens a blank or dead preview | Build step never ran. lazy.nvim only runs a plugin's `build` on a fresh install, not after `:Lazy clean` removes and re-adds it | `:Lazy build markdown-preview.nvim` or `:Lazy build typst-preview.nvim` |
 
 ## Stow
 
