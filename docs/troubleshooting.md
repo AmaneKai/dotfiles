@@ -52,6 +52,10 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `$mod+Shift+b` shows only "Turn Bluetooth On" | No controller; `bluetoothctl show` timed out after 2 s | See the next row |
+| Earbuds need pairing mode every time, `Paired` goes back to `no` after a disconnect | Paired but not bonded: `bluetoothctl info <MAC>` shows `Bonded: no`. BlueZ pairs without bonding when the adapter is not pairable | Pair once from `$mod+Shift+b` with the earbuds in pairing mode; the menu turns pairable on. Or set `AlwaysPairable = true` in `/etc/bluetooth/main.conf` and restart bluetooth. Verify with `bluetoothctl info <MAC> \| grep Bonded` |
+| Menu says `Failed: not found: put the device in pairing mode` | BlueZ cannot see the device: case closed, out of range, or not in pairing mode. A device that is not bonded is only visible in pairing mode | Open the case, hold the button on the case until the light flashes white, then pick it again |
+| Menu says `Failed: Device <MAC> not available` | The scan entry expired before you picked it | Pick "Scan for new devices", then choose the device again |
+| AirPods do not connect when the case opens | AirPods usually reconnect to the device they last used, such as a phone (typical behavior, UNVERIFIED here) | Take them out of the case, turn off the phone's Bluetooth, then connect from `$mod+Shift+b` |
 | No adapter: no `/sys/class/bluetooth`, no bluetooth in `rfkill list` | Adapter disabled at firmware level | Check the BIOS wireless / Bluetooth toggle. Then `sudo systemctl enable --now bluetooth` |
 
 ## Audio, power, video

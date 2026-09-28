@@ -85,7 +85,7 @@ Capture event strings with `acpi_listen` (package `acpid`).
 
 ## Bluetooth
 
-On the audited Arch install the adapter is absent: no `/sys/class/bluetooth`, no bluetooth entry in `rfkill list`, no Intel `8087:` device in `lsusb`.
+The adapter first appeared missing on the audited Arch install: no `/sys/class/bluetooth`, no bluetooth entry in `rfkill list`, no Intel `8087:` device in `lsusb`. After the BIOS wireless toggle it shows up as `hci0` (Intel `8087:0a2b`).
 
 | Step | Command or action |
 | --- | --- |
@@ -94,6 +94,18 @@ On the audited Arch install the adapter is absent: no `/sys/class/bluetooth`, no
 | After it shows | `sudo systemctl enable --now bluetooth` |
 
 `audio-switch.sh airpods` uses the first Bluetooth audio card it finds. No MAC address is hardcoded.
+
+### Pairing that is remembered
+
+| Fact | Detail |
+| --- | --- |
+| Symptom | Earbuds must be put in pairing mode every time. `bluetoothctl info <MAC>` shows `Paired: yes` but `Bonded: no`, and `Paired` returns to `no` after a disconnect |
+| Cause | BlueZ 5.87 pairs without bonding when the adapter is not pairable. `Pairable` is off unless a pairing agent runs or `AlwaysPairable = true` is set in `/etc/bluetooth/main.conf` (default `false`). Inferred from `btmgmt info`, whose current settings lacked `bondable`; not yet confirmed by re-pairing |
+| Fix in repo | `i3/.config/i3/scripts/bluetooth-menu.sh` runs `bluetoothctl pairable on`. If the device is paired but not bonded it removes it and scans again (`remove` deletes the device from BlueZ, and `pair` fails with `not available` until it is found again), then pairs, trusts and connects. The notification shows the real error |
+| Fix by hand, system-wide | Set `AlwaysPairable = true` in `/etc/bluetooth/main.conf`, then `sudo systemctl restart bluetooth`. This BlueZ has no `main.conf.d` drop-in |
+| Check | `bluetoothctl info <MAC> \| grep -E 'Paired\|Bonded\|Trusted'` should show all three as `yes` |
+
+Pair once with the earbuds in pairing mode. After `Bonded: yes`, connect from `$mod+Shift+b` without pairing mode.
 
 ## Polybar
 

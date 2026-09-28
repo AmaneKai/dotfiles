@@ -13,13 +13,43 @@ device_is_connected() {
     bluetoothctl info "$1" | grep -q "Connected: yes"
 }
 
+device_is_bonded() {
+    bluetoothctl info "$1" | grep -q "Bonded: yes"
+}
+
 device_is_paired() {
     bluetoothctl info "$1" | grep -q "Paired: yes"
 }
 
+device_is_known() {
+    bluetoothctl devices | grep -q "$1"
+}
+
+rediscover() {
+    timeout "$((SCAN_SECONDS + 2))" bluetoothctl --timeout "$SCAN_SECONDS" scan on >/dev/null 2>&1
+    device_is_known "$1"
+}
+
+pair_and_bond() {
+    local mac=$1
+    bluetoothctl pairable on >/dev/null
+    device_is_paired "$mac" && bluetoothctl remove "$mac" >/dev/null
+    if ! device_is_known "$mac" && ! rediscover "$mac"; then
+        echo "not found: put the device in pairing mode"
+        return 1
+    fi
+    bluetoothctl pair "$mac" && bluetoothctl trust "$mac"
+}
+
 pair_if_needed() {
-    device_is_paired "$1" && return 0
-    bluetoothctl pair "$1" && bluetoothctl trust "$1"
+    device_is_bonded "$1" || pair_and_bond "$1"
+}
+
+connect_device() {
+    local mac=$1 output
+    output=$( { pair_if_needed "$mac" && bluetoothctl connect "$mac"; } 2>&1 ) && return 0
+    printf '%s\n' "$output" | sed 's/\x1b\[[0-9;]*[A-Za-z]//g' | grep -v '^\s*$' | tail -1
+    return 1
 }
 
 device_name() {
@@ -61,7 +91,7 @@ build_menu() {
 }
 
 main() {
-    local choice value
+    local choice value reason
     choice=$(build_menu | choose_menu_entry "bluetooth") || exit 0
     value=$(entry_value "$choice")
 
@@ -77,10 +107,10 @@ main() {
             ;;
         connect)
             notify "󰂯" "Connecting..."
-            if pair_if_needed "$value" && bluetoothctl connect "$value"; then
+            if reason=$(connect_device "$value"); then
                 notify "󰂱" "Connected to $(device_name "$value")"
             else
-                notify "󰂯" "Failed to connect"
+                notify "󰂯" "Failed: ${reason:-unknown error}"
             fi
             ;;
         disconnect)
