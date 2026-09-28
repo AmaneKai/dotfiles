@@ -60,7 +60,6 @@ exec_always --no-startup-id xsetroot -cursor_name left_ptr
 exec_always --no-startup-id autotiling
 
 # System Daemons
-exec --no-startup-id nm-applet
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id dunst
 exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/bin/lock.sh --nofork
