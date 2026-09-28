@@ -1,6 +1,6 @@
 # Neovim
 
-Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local leader: `\`. External tools: see `docs/packages.md`.
+Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local leader: `\`. No LSP; debugging through nvim-dap. External tools: see `docs/packages.md`.
 
 ## Plugins
 
@@ -8,8 +8,9 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | --- | --- | --- |
 | folke/lazy.nvim | plugin manager | `lua/callo/lazy.lua` |
 | nvim-lua/plenary.nvim | library | `lua/plugins/init.lua` |
-| neovim/nvim-lspconfig, mason.nvim, mason-lspconfig.nvim | LSP | `lua/plugins/lsp.lua` |
-| saghen/blink.cmp, friendly-snippets, blink-cmp-spell | completion | `lua/plugins/blink.lua` |
+| mfussenegger/nvim-dap, rcarriga/nvim-dap-ui, nvim-neotest/nvim-nio | debugger, UI | `lua/plugins/dap.lua` |
+| mfussenegger/nvim-dap-python, leoluz/nvim-dap-go | Python, Go debug configs | `lua/plugins/dap.lua` |
+| saghen/blink.cmp, friendly-snippets, blink-cmp-spell | completion (path, snippets, buffer) | `lua/plugins/blink.lua` |
 | stevearc/conform.nvim | formatting | `lua/plugins/conform.lua` |
 | nvim-treesitter/nvim-treesitter (`main`) | parsers, highlight | `lua/plugins/treesitter.lua` |
 | nvim-telescope/telescope.nvim | fuzzy finder | `lua/plugins/telescope.lua` |
@@ -20,8 +21,6 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | mattn/emmet-vim | HTML expansion | `lua/plugins/emmet.lua` |
 | NvChad/nvim-colorizer.lua | color previews | `lua/plugins/tailwind.lua` |
 | rose-pine/neovim, folke/tokyonight.nvim | colorschemes (rose-pine active) | `lua/plugins/colors.lua` |
-| mfussenegger/nvim-jdtls | Java | `lua/plugins/jdtls.lua` |
-| AlexandrosAlexiou/kotlin.nvim | Kotlin | `lua/plugins/kotlin.lua` |
 | Vigemus/iron.nvim, goerz/jupytext.vim | Python REPL, notebooks as `.py` | `lua/plugins/python.lua` |
 | AmaneKai/ipynb-peek.nvim | notebook preview | `lua/plugins/ipynb-peek.lua` |
 | AmaneKai/md-peek.nvim | Markdown preview | `lua/plugins/md-peek.lua` |
@@ -32,20 +31,29 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 
 ## Languages
 
-| Language | LSP | Formatter |
-| --- | --- | --- |
-| Lua | lua_ls | none |
-| JavaScript, TypeScript | vtsls, eslint | eslint_d |
-| Svelte | svelte | prettier, eslint_d |
-| HTML, CSS | html, tailwindcss | prettier |
-| JSON, Markdown | none | prettier |
-| Python | pyright | ruff_format |
-| Rust | rust_analyzer (clippy) | none |
-| Java | jdtls (Mason package) | jdtls, on save |
-| Kotlin | kotlin-lsp (Mason package) | none |
-| Go | gopls, enabled when `gopls` is on PATH | none |
+| Language | Debug adapter | Formatter | Indent |
+| --- | --- | --- | --- |
+| C | gdb (`gdb --interpreter=dap`) | none | 4 spaces |
+| C++ | gdb | none | 2 spaces |
+| Rust | gdb | none | 4 spaces |
+| Python | debugpy (nvim-dap-python) | ruff_format | 4 spaces |
+| Go | delve (nvim-dap-go) | none | 4 spaces |
+| JavaScript, TypeScript | js-debug (`pwa-node`) | eslint_d | 2 spaces |
+| C# | netcoredbg | none | 4 spaces |
+| Svelte | none | prettier, eslint_d | 2 spaces |
+| HTML, CSS, JSON | none | prettier | 2 spaces |
+| Markdown | none | prettier | 4 spaces |
+| everything else (Java included) | none | none | 4 spaces |
 
-Mason installs: lua_ls, tailwindcss, html, vtsls, rust_analyzer, svelte, eslint, pyright. Install jdtls and kotlin-lsp with `:MasonInstall jdtls kotlin-lsp`.
+Adapter locations:
+
+| Adapter | Expected at |
+| --- | --- |
+| gdb, delve (`dlv`), netcoredbg, node | on `PATH` |
+| js-debug | `~/.local/share/nvim/js-debug/src/dapDebugServer.js` |
+| debugpy | `~/.local/share/nvim/debugpy/bin/python` venv, else system `python3` with debugpy |
+
+Launch configs: C, C++, Rust and C# prompt for the program path (C# starts in `bin/Debug/`). JavaScript and TypeScript launch the current file or attach to a process. Python and Go use the configs from nvim-dap-python and nvim-dap-go.
 
 Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html, css, tsx, json, go, markdown, markdown_inline, kotlin, svelte, python.
 
@@ -74,7 +82,6 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | `<leader><leader>` | n | source current file |
 | `<leader>tt` | n | terminal split |
 | `<leader>gr`, `<leader>gb`, `<leader>gt` | n | `./gradlew` run, build, test |
-| `<leader>zig` | n | `:LspRestart` |
 | `<leader>u` | n | undotree |
 | `<leader>f` | n | format with conform |
 
@@ -92,22 +99,20 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | `<C-e>` | harpoon menu |
 | `<C-h>`, `<C-n>`, `<C-s>`, `<C-t>` | harpoon 1 to 4 |
 
-## Keymaps: LSP (buffer with LSP attached)
+## Keymaps: debug
 
-| Key | Mode | Action |
-| --- | --- | --- |
-| `gd` | n | definition |
-| `K` | n | hover |
-| `<leader>vws` | n | workspace symbol |
-| `<leader>vd` | n | diagnostic float |
-| `[d`, `]d` | n | prev, next diagnostic |
-| `<leader>vca` | n | code action |
-| `<leader>vrr` | n | references |
-| `<leader>vrn` | n | rename |
-| `<C-h>` | i | signature help |
-| `<leader>th` | n | toggle inlay hints |
-| `<leader>td` | n | toggle diagnostic virtual text |
-| `<leader>jw` | n | Java: wipe jdtls workspace and restart |
+| Key | Action |
+| --- | --- |
+| `<leader>b` | toggle breakpoint |
+| `<leader>B` | conditional breakpoint |
+| `<leader>cc` | start or continue |
+| `<leader>cn` | step over |
+| `<leader>ci` | step into |
+| `<leader>co` | step out |
+| `<leader>cl` | run last config |
+| `<leader>cq` | stop |
+| `<leader>cr` | toggle REPL |
+| `<leader>cu` | toggle UI (opens and closes automatically with the session) |
 
 ## Keymaps: git
 
@@ -143,7 +148,7 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 
 | Option | Value |
 | --- | --- |
-| Indent | 4 spaces. 2 spaces for JS, TS, HTML, CSS, JSON, Svelte, Lua, YAML, Markdown, C++. Tabs width 4 for C |
+| Indent | 4 spaces. 2 spaces for webdev (JS, TS, JSX, TSX, HTML, CSS, SCSS, JSON, Svelte, Vue) and C++. Go and YAML runtime styles disabled so they follow the rule |
 | Numbers | relative |
 | Color column | 100 |
 | Clipboard | `unnamedplus` (needs xclip on X11) |
@@ -158,14 +163,13 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | --- | --- |
 | `*.html`, `*.css`, `*.js` | text change, insert leave |
 | `*.typ` | text change, insert leave |
-| `*.kt` | normal-mode text change, insert leave |
 
 ## Commands
 
 | Command | Action |
 | --- | --- |
 | `:Lazy` | plugin manager |
-| `:Mason` | LSP installer |
+| `:DapContinue` | start or continue debugging |
 | `:checkhealth` | diagnostics |
 | `:TSUpdate` | update parsers |
 | `:MarkdownPreviewToggle` | browser preview on port 8081 |

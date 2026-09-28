@@ -24,7 +24,7 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | git | lazy.nvim bootstrap, clone | `nvim/.config/nvim/lua/callo/lazy.lua` | git | git | git |
 | stow | install | all packages | stow | stow | stow |
 | C compiler, make | nvim-treesitter parsers, luarocks | `nvim/.config/nvim/lua/plugins/treesitter.lua` | base-devel | gcc make | build-essential |
-| curl, tar, unzip, gzip, xz | nvim-treesitter, mason downloads, installers, Nerd Font archive | `lua/plugins/treesitter.lua`, `lua/plugins/lsp.lua` | curl tar unzip gzip (xz is in `base`) | curl tar unzip gzip (xz preinstalled, UNVERIFIED) | curl tar unzip gzip xz-utils |
+| curl, tar, unzip, gzip, xz | nvim-treesitter, installers, Nerd Font and debug adapter archives | `lua/plugins/treesitter.lua`, `lua/plugins/dap.lua` | curl tar unzip gzip (xz is in `base`) | curl tar unzip gzip (xz preinstalled, UNVERIFIED) | curl tar unzip gzip xz-utils |
 
 ## X11 session (needed by i3, polybar, system)
 
@@ -36,6 +36,7 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | xsetroot | i3 exec_always | `i3/.config/i3/config` | xorg-xsetroot | xsetroot | x11-xserver-utils |
 | xrandr | polybar launcher | `polybar/.config/polybar/launch.sh` | xorg-xrandr | xrandr | x11-xserver-utils |
 | synaptics driver, synclient | circular scroll | `system/etc/X11/xorg.conf.d/70-synaptics.conf` | xf86-input-synaptics | xorg-x11-drv-synaptics-legacy | xserver-xorg-input-synaptics |
+| xev | check whether F-keys reach X | `docs/hardware-cf-sv7.md` | xorg-xev | xev | x11-utils |
 
 ## i3 package
 
@@ -52,6 +53,9 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | wezterm | `$terminal` | `i3/.config/i3/config` | wezterm | COPR wezfurlong/wezterm-nightly | manual (apt.fury.io/wez repo) |
 | pcmanfm | `$fileManager` | `i3/.config/i3/config` | pcmanfm | pcmanfm | pcmanfm |
 | rofi | launcher, menus | `i3/.config/i3/config`, `i3/.config/i3/scripts/*.sh` | rofi | rofi | rofi |
+| debugpy | `python3 -m venv ~/.local/share/nvim/debugpy && ~/.local/share/nvim/debugpy/bin/pip install debugpy` |
+| js-debug | `curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz \| tar -xz -C ~/.local/share/nvim` (creates `js-debug/`) |
+| netcoredbg | `curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz \| tar -xz -C ~/.local/share && ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg` |
 | networkmanager_dmenu | `$mod+n` | `i3/.config/i3/config` | networkmanager-dmenu | manual | manual |
 | maim | screenshots, lock image | `i3/.config/i3/config`, `i3/.config/i3/scripts/lock-gen.py` | maim | maim | maim |
 | xclip | screenshot to clipboard | `i3/.config/i3/config` | xclip | xclip | xclip |
@@ -64,7 +68,10 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | python3, Pillow, NumPy | lock image | `i3/.config/i3/scripts/lock-gen.py` | python python-pillow python-numpy | python3 python3-pillow python3-numpy | python3 python3-pil python3-numpy |
 | i3lock-color | styled lock screen (falls back to plain i3lock) | `i3lock/bin/lock.sh` | i3lock-color (AUR) | manual (several COPRs exist, none verified) | manual (build from source) |
 | Papirus icons | dunst icon path | `dunst/.config/dunst/dunstrc` | papirus-icon-theme | papirus-icon-theme | papirus-icon-theme |
-| NetworkManager | networkmanager_dmenu | n/a | networkmanager | NetworkManager | network-manager |
+| NetworkManager | debugpy | `python3 -m venv ~/.local/share/nvim/debugpy && ~/.local/share/nvim/debugpy/bin/pip install debugpy` |
+| js-debug | `curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz \| tar -xz -C ~/.local/share/nvim` (creates `js-debug/`) |
+| netcoredbg | `curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz \| tar -xz -C ~/.local/share && ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg` |
+| networkmanager_dmenu | n/a | networkmanager | NetworkManager | network-manager |
 
 ## polybar package
 
@@ -104,13 +111,13 @@ Do not install `pulseaudio` alongside `pipewire-pulse`. They conflict.
 | Config tool | setup | n/a | fcitx5-configtool | fcitx5-configtool | fcitx5-config-qt |
 | qt5ct | QT_QPA_PLATFORMTHEME | `zsh/.zshrc`, `fish/.config/fish/config.fish` | qt5ct | qt5ct | qt5ct |
 
-## Power, video, hardware (not configured in repo, except acpid placeholders)
+## Power, video, hardware (not configured in repo)
 
 | Tool | Used by | Where | Arch | Fedora | Debian family |
 | --- | --- | --- | --- | --- | --- |
 | power-profiles-daemon | power profiles | n/a | power-profiles-daemon | power-profiles-daemon | power-profiles-daemon |
 | thermald | Intel thermal | n/a | thermald | thermald | thermald |
-| acpid | F4, F5, F6 keys | `system/install.sh` | acpid | acpid | acpid |
+| acpid | optional fallback for F4, F5, F6 when they do not reach X | `system/install.sh` | acpid | acpid | acpid |
 | Intel VA-API (iHD) | video decode | n/a | intel-media-driver | libva-intel-media-driver, or intel-media-driver (RPMF-nonfree) for full codecs | intel-media-va-driver, or intel-media-va-driver-non-free (Debian non-free, Ubuntu multiverse) |
 | vainfo | verify VA-API | n/a | libva-utils | libva-utils | vainfo |
 
@@ -132,10 +139,10 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | bun | PATH, `preflight`, ipynb-peek build | `zsh/.zshrc`, `nvim/.config/nvim/lua/plugins/ipynb-peek.lua` | bun | manual | manual |
 | deno | PATH, optional `~/.deno/env` | `zsh/.zshrc`, `config.fish` | deno | manual | manual |
 | ghcup | PATH | `zsh/.zshrc` | ghcup-hs-bin (AUR) or manual | manual | manual |
-| JDK | JAVA_HOME, jdtls | `zsh/.zshrc`, `config.fish` | jdk-openjdk (currently 27) | java-latest-openjdk-devel (currently 27) | openjdk-25-jdk (26 and 27 not packaged) |
+| JDK | JAVA_HOME, gradle | `zsh/.zshrc`, `config.fish` | jdk-openjdk (currently 27) | java-latest-openjdk-devel (currently 27) | openjdk-25-jdk (26 and 27 not packaged) |
 | opencode | PATH | `zsh/.zshrc` | opencode | manual | manual |
-| Node.js, npm | markdown-preview, md-peek, live-server, mason LSPs, jqinit | `lua/plugins/markdown.lua`, `md-peek.lua`, `liveserver.lua`, `lsp.lua` | nodejs npm | nodejs24 nodejs24-bin nodejs24-npm nodejs24-npm-bin | nodejs npm |
-| rustup, cargo | `~/.cargo/bin` in PATH, clippy for rust_analyzer | `zsh/.zshrc`, `lua/plugins/lsp.lua` | rustup | rustup | rustup |
+| Node.js, npm | markdown-preview, md-peek, live-server, js-debug, jqinit | `lua/plugins/markdown.lua`, `md-peek.lua`, `liveserver.lua`, `dap.lua` | nodejs npm | nodejs24 nodejs24-bin nodejs24-npm nodejs24-npm-bin | nodejs npm |
+| rustup, cargo | `~/.cargo/bin` in PATH, tree-sitter-cli build (Debian family) | `zsh/.zshrc`, `config.fish` | rustup | rustup | rustup |
 | xdg-user-dir | organize-downloads (optional) | `scripts/.local/bin/organize-downloads` | xdg-user-dirs | xdg-user-dirs | xdg-user-dirs |
 
 ## tmux package
@@ -164,10 +171,14 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | Brave browser | live-server browser | `lua/plugins/liveserver.lua` | UNVERIFIED | UNVERIFIED | UNVERIFIED |
 | ipython | iron.nvim REPL | `lua/plugins/python.lua` | ipython | python3-ipython | ipython3 |
 | jupytext | jupytext.vim | `lua/plugins/python.lua` | python-jupytext (AUR) | python3-jupytext | python3-jupytext / manual (pipx) |
-| JDK | jdtls | `lua/plugins/jdtls.lua` | jdk-openjdk | java-latest-openjdk-devel | openjdk-25-jdk |
 | bun | ipynb-peek build | `lua/plugins/ipynb-peek.lua` | bun | manual | manual |
+| gdb 14+ | C, C++, Rust debugging | `lua/plugins/dap.lua` | gdb | gdb | gdb |
+| delve | Go debugging | `lua/plugins/dap.lua` | delve | delve | delve |
+| debugpy | Python debugging | `lua/plugins/dap.lua` | manual (venv) | manual (venv) | manual (venv, needs python3-venv) |
+| js-debug | JavaScript, TypeScript debugging | `lua/plugins/dap.lua` | manual | manual | manual |
+| netcoredbg | C# debugging | `lua/plugins/dap.lua` | manual | manual | manual |
 
-Mason installs these LSPs itself (`lua/plugins/lsp.lua`): lua_ls, tailwindcss, html, vtsls, rust_analyzer, svelte, eslint, pyright. The npm-based ones need Node.js and npm. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`).
+No LSP is configured. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`). debugpy, js-debug and netcoredbg use one install recipe on every distro (see Manual installs) so the paths in `dap.lua` match.
 
 ## scripts package
 
@@ -201,12 +212,15 @@ Mason installs these LSPs itself (`lua/plugins/lsp.lua`): lua_ls, tailwindcss, h
 | bun | `curl -fsSL https://bun.sh/install \| bash` |
 | ghcup | `curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org \| sh` |
 | opencode | `curl -fsSL https://opencode.ai/install \| bash` |
-| rustup toolchain | Arch, Debian family: `rustup default stable && rustup component add clippy`. Fedora: `rustup-init -y` first |
+| rustup toolchain | Arch, Debian family: `rustup default stable`. Fedora: `rustup-init -y` |
 | JetBrainsMono Nerd Font | `mkdir -p ~/.local/share/fonts/JetBrainsMono && curl -fsSL https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz \| tar -xJ -C ~/.local/share/fonts/JetBrainsMono && fc-cache -f` |
 | Neovim (Debian family) | `curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \| sudo tar -xz -C /opt && sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim` |
 | tree-sitter-cli (Debian family) | `rustup run stable cargo install --locked tree-sitter-cli` |
 | npm tools | `npm config set prefix ~/.npm-global && npm install -g prettier eslint_d` |
 | pipx tools | `pipx install autotiling ruff jupytext` (install only the ones your distro lacks) |
+| debugpy | `python3 -m venv ~/.local/share/nvim/debugpy && ~/.local/share/nvim/debugpy/bin/pip install debugpy` |
+| js-debug | `curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz \| tar -xz -C ~/.local/share/nvim` (creates `js-debug/`) |
+| netcoredbg | `curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz \| tar -xz -C ~/.local/share && ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg` |
 | networkmanager_dmenu | `sudo curl -fsSL -o /usr/local/bin/networkmanager_dmenu https://raw.githubusercontent.com/firecat53/networkmanager-dmenu/main/networkmanager_dmenu && sudo chmod +x /usr/local/bin/networkmanager_dmenu`. Needs PyGObject and libnm typelibs: Fedora `python3-gobject NetworkManager-libnm`, Debian family `python3-gi gir1.2-nm-1.0` |
 | i3lock-color | Clone https://github.com/Raymo111/i3lock-color and run `./install-i3lock-color.sh`. Build dependencies: see its README (UNVERIFIED per distro) |
 | wezterm apt repo | See `docs/install-debian.md` |

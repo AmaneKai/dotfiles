@@ -8,12 +8,11 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | --- | --- | --- |
 | Circular scroll does nothing | Wayland or libinput session, or X not restarted | Use X11 with the synaptics driver. Log out and `startx` again. Check `synclient -l \| grep CircularScrolling` |
 | MinSpeed, MaxSpeed, AccelFactor, CircScrollDelta have no effect | Decimal options are ignored in xorg.conf | Set them with `synclient` from the i3 config. See `docs/hardware-cf-sv7.md` |
-| F4, F5, F6 do nothing in i3 | They arrive as ACPI events, not X keys | Handle them with acpid rules. See `docs/hardware-cf-sv7.md` |
+| F4, F5, F6 do nothing in i3 | The key arrives only as an ACPI event, not an X keysym | Check with `xev -event keyboard`. If no keysym, use the acpid fallback in `docs/hardware-cf-sv7.md` |
 | acpid rule runs but audio does not change | acpid runs as root and cannot reach your PipeWire | Run the action as your user with `XDG_RUNTIME_DIR=/run/user/<UID>` |
 | acpid rule with a percent value breaks | acpid expands `%` | Write `%%` in the rule file |
 | Mute key toggles several times per press | Key fires several ACPI events | Debounce with a `flock` script |
 | acpid ignores new rules after restart | Old acpid process still running | `sudo systemctl stop acpid && sudo pkill -9 acpid; sudo systemctl start acpid` |
-| `system/install.sh` prints `skipped acpid setup` | `system/etc/acpi/` is missing from the repo | Add the files. See `docs/hardware-cf-sv7.md` |
 | Japanese input never appears | fcitx5 not running, or session not started through `~/.xinitrc` | Stow `xinit` and use `startx`. fcitx5 starts from its XDG autostart file via `dex`; otherwise run `fcitx5 -d` |
 | Wrong keyboard layout in X | X11 keymap not set | `sudo localectl set-x11-keymap jp jp106` |
 
@@ -74,6 +73,9 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | lazy.nvim errors on plenary or rockspec | luarocks missing | Install luarocks, or set `rocks = { enabled = false }` in `lazy.setup` |
 | nvim-treesitter fails to build parsers | Neovim below 0.12 or tree-sitter-cli below 0.26.1 | Install newer versions. See `docs/packages.md` |
 | `<leader>f` formats nothing | Formatter missing (ruff, prettier, eslint_d) | Install per `docs/packages.md` |
+| `<leader>cc` says no configuration for the filetype | No adapter defined for that language | Supported: C, C++, Rust, Python, Go, JS, TS, C#. See `docs/neovim.md` |
+| Debug session starts and exits at once | Adapter not installed or not at the expected path | Check `gdb --version`, `dlv version`, `netcoredbg --version`, `ls ~/.local/share/nvim/js-debug/src/dapDebugServer.js`, `~/.local/share/nvim/debugpy/bin/python -c "import debugpy"` |
+| C, C++ or Rust breakpoints never hit | Binary built without debug info | Build with `-g` (C, C++) or a debug profile (`cargo build`) |
 | live-server build fails | `npm install -g` needs a writable prefix | `npm config set prefix ~/.npm-global` |
 
 ## Stow

@@ -29,7 +29,7 @@ cd ~/aur && git clone https://aur.archlinux.org/ghcup-hs-bin.git && (cd ghcup-hs
 X11 session (i3, polybar, system):
 
 ```bash
-sudo pacman -S --needed xorg-server xorg-xinit xorg-xrdb xorg-xsetroot xorg-xrandr xf86-input-synaptics
+sudo pacman -S --needed xorg-server xorg-xinit xorg-xrdb xorg-xsetroot xorg-xrandr xorg-xev xf86-input-synaptics
 ```
 
 Audio. Answer yes if pacman offers to remove `pulseaudio`:
@@ -65,7 +65,7 @@ sudo pacman -S --needed fcitx5 fcitx5-mozc fcitx5-gtk fcitx5-qt fcitx5-configtoo
 Power, video, hardware. Do not install `tlp` or `libva-intel-driver`:
 
 ```bash
-sudo pacman -S --needed power-profiles-daemon thermald acpid intel-media-driver libva-utils
+sudo pacman -S --needed power-profiles-daemon thermald intel-media-driver libva-utils
 ```
 
 zsh:
@@ -89,7 +89,7 @@ sudo pacman -S --needed tmux xclip fzf
 nvim:
 
 ```bash
-sudo pacman -S --needed neovim tree-sitter-cli ripgrep fd luarocks xclip ruff prettier eslint_d ipython nodejs npm jdk-openjdk bun
+sudo pacman -S --needed neovim tree-sitter-cli ripgrep fd luarocks xclip ruff prettier eslint_d ipython nodejs npm bun gdb delve
 ```
 
 scripts:
@@ -109,8 +109,18 @@ sudo pacman -S --needed fastfetch ghostty
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 rustup default stable
-rustup component add clippy
 mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
+```
+
+Debug adapters (same recipe on every distro, paths match `nvim/.config/nvim/lua/plugins/dap.lua`):
+
+```bash
+python3 -m venv ~/.local/share/nvim/debugpy
+~/.local/share/nvim/debugpy/bin/pip install debugpy
+mkdir -p ~/.local/share/nvim
+curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz | tar -xz -C ~/.local/share/nvim
+curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz | tar -xz -C ~/.local/share
+ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg
 ```
 
 `hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
@@ -118,7 +128,7 @@ mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
 ## 5. Services
 
 ```bash
-sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald acpid
+sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald
 systemctl --user enable --now pipewire pipewire-pulse wireplumber
 ```
 
@@ -154,7 +164,7 @@ stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar r
 
 ## 9. System files
 
-Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files. Prints `no etc/acpi in repo; skipped acpid setup` until `system/etc/acpi/` exists (see `docs/known-issues.md`).
+Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files.
 
 ```bash
 ~/Dotfiles/system/install.sh
@@ -201,7 +211,7 @@ autorandr --save laptop
 | `echo $SHELL` | `/usr/bin/zsh` |
 | `pacman -Qo /usr/bin/i3lock` | `/usr/bin/i3lock is owned by i3lock-color ...` |
 | `pactl info \| grep 'Server Name'` | `Server Name: PulseAudio (on PipeWire ...)` |
-| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald acpid` | `active` five times |
+| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald` | `active` four times |
 | `pacman -Q tlp libva-intel-driver pulseaudio` | `error: package '...' was not found` for each |
 | `powerprofilesctl get` | `balanced` |
 | `vainfo 2>&1 \| grep -i 'driver version'` | contains `Intel iHD driver` |

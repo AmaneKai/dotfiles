@@ -60,43 +60,28 @@ Expected: `CircularScrolling = 1`, `CircularPad = 1`, `CircScrollTrigger = 0`.
 
 ## Function keys F4, F5, F6
 
-| Fact | Detail |
-| --- | --- |
-| Delivery | ACPI events, not X keysyms. i3 `bindsym` cannot see them |
-| Handler | acpid rules in `/etc/acpi/events/` |
-| Percent sign | Write `%` as `%%` inside acpid rule files |
-| User context | acpid runs as root. Run the action as your user with `XDG_RUNTIME_DIR=/run/user/<UID>` or PipeWire is unreachable |
-| Mute key | Fires several events per press. Needs a `flock` debounce script |
-| Restart | If `systemctl restart acpid` does not pick up rules: `sudo systemctl stop acpid && sudo pkill -9 acpid; sudo systemctl start acpid` |
-| Repo state | `system/install.sh` expects `system/etc/acpi/mute-debounced.sh` and `system/etc/acpi/events/*` with `__USER__` and `__UID__` placeholders. Those files are not in the repo |
-| Key functions | Which action F4, F5, F6 perform: UNVERIFIED |
+On the audited Arch install these keys reach X and work through the i3 volume and brightness bindings (`XF86Audio*`, `XF86MonBrightness*`). acpid is not needed.
 
-Capture the event strings:
+Check on a new install:
 
 ```bash
-sudo pacman -S --needed acpid   # or dnf / apt
-sudo systemctl enable --now acpid
-acpi_listen
+xev -event keyboard
 ```
 
-Press each key and copy the printed line. To restore the missing files, add them under `system/etc/acpi/` with `__USER__` and `__UID__` in place of your user name and UID, then run `system/install.sh`. Template (not from the repo, UNVERIFIED):
+Press each key. A `keysym` line such as `XF86AudioMute` means i3 handles it. No output means the key arrives only as an ACPI event; use the acpid fallback below.
 
-`system/etc/acpi/events/cf-sv7-mute`:
+### acpid fallback
 
-```text
-event=<line from acpi_listen>
-action=/etc/acpi/mute-debounced.sh
-```
+| Fact | Detail |
+| --- | --- |
+| Handler | acpid rules in `/etc/acpi/events/`, shipped from `system/etc/acpi/` by `system/install.sh` |
+| Placeholders | Write `__USER__` and `__UID__`; `system/install.sh` fills them in |
+| Percent sign | Write `%` as `%%` inside acpid rule files |
+| User context | acpid runs as root. Run the action as your user with `XDG_RUNTIME_DIR=/run/user/<UID>` or PipeWire is unreachable |
+| Mute key | Can fire several events per press. Debounce with `flock` |
+| Restart | If `systemctl restart acpid` does not pick up rules: `sudo systemctl stop acpid && sudo pkill -9 acpid; sudo systemctl start acpid` |
 
-`system/etc/acpi/mute-debounced.sh`:
-
-```sh
-#!/bin/sh
-exec 9>/run/acpi-mute.lock
-flock -n 9 || exit 0
-runuser -u __USER__ -- env XDG_RUNTIME_DIR=/run/user/__UID__ wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-sleep 0.3
-```
+Capture event strings with `acpi_listen` (package `acpid`).
 
 ## Bluetooth
 

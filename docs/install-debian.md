@@ -27,7 +27,7 @@ Optional, for `intel-media-va-driver-non-free`: enable the `non-free` component 
 X11 session (i3, polybar, system):
 
 ```bash
-sudo apt install -y xserver-xorg xinit x11-xserver-utils xserver-xorg-input-synaptics
+sudo apt install -y xserver-xorg xinit x11-xserver-utils x11-utils xserver-xorg-input-synaptics
 ```
 
 Audio. Do not install `pulseaudio`:
@@ -90,7 +90,7 @@ sudo apt install -y fcitx5 fcitx5-mozc fcitx5-frontend-gtk3 fcitx5-frontend-qt5 
 Power, video, hardware. Do not install `tlp` or `i965-va-driver`:
 
 ```bash
-sudo apt install -y power-profiles-daemon thermald acpid intel-media-va-driver vainfo
+sudo apt install -y power-profiles-daemon thermald intel-media-va-driver vainfo
 ```
 
 zsh:
@@ -114,7 +114,7 @@ sudo apt install -y tmux xclip fzf
 nvim. Distro Neovim and tree-sitter-cli are too old for nvim-treesitter `main` (needs Neovim 0.12, tree-sitter-cli 0.26.1). Install Neovim from the release tarball; tree-sitter-cli is built in step 4:
 
 ```bash
-sudo apt install -y ripgrep fd-find luarocks xclip ipython3 openjdk-25-jdk nodejs npm
+sudo apt install -y ripgrep fd-find luarocks xclip ipython3 python3-venv nodejs npm gdb delve
 curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz | sudo tar -xz -C /opt
 sudo ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
 pipx install ruff
@@ -155,7 +155,6 @@ curl -fsSL https://bun.sh/install | bash
 curl -fsSL https://opencode.ai/install | bash
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 rustup default stable
-rustup component add clippy
 rustup run stable cargo install --locked tree-sitter-cli
 mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
 npm install -g prettier eslint_d
@@ -163,12 +162,23 @@ npm install -g prettier eslint_d
 
 gradle: the Debian package is 4.4.1. Download a current release from https://services.gradle.org/distributions/ or use SDKMAN (UNVERIFIED).
 
+Debug adapters (same recipe on every distro, paths match `nvim/.config/nvim/lua/plugins/dap.lua`):
+
+```bash
+python3 -m venv ~/.local/share/nvim/debugpy
+~/.local/share/nvim/debugpy/bin/pip install debugpy
+mkdir -p ~/.local/share/nvim
+curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz | tar -xz -C ~/.local/share/nvim
+curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz | tar -xz -C ~/.local/share
+ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg
+```
+
 `hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
 
 ## 5. Services
 
 ```bash
-sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald acpid
+sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald
 systemctl --user enable --now pipewire pipewire-pulse wireplumber
 ```
 
@@ -205,7 +215,7 @@ stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar r
 
 ## 9. System files
 
-Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files. Prints `no etc/acpi in repo; skipped acpid setup` until `system/etc/acpi/` exists (see `docs/known-issues.md`).
+Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files.
 
 ```bash
 ~/Dotfiles/system/install.sh
@@ -246,7 +256,7 @@ autorandr --save laptop
 | `echo $SHELL` | `/usr/bin/zsh` |
 | `i3lock --help 2>&1 \| grep -c -- --clock` | a number above 0 (i3lock-color). Output format UNVERIFIED |
 | `pactl info \| grep 'Server Name'` | `Server Name: PulseAudio (on PipeWire ...)` |
-| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald acpid` | `active` five times |
+| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald` | `active` four times |
 | `dpkg -l tlp i965-va-driver pulseaudio 2>/dev/null \| grep ^ii` | no output |
 | `powerprofilesctl get` | `balanced` |
 | `vainfo 2>&1 \| grep -i 'driver version'` | contains `Intel iHD driver` |

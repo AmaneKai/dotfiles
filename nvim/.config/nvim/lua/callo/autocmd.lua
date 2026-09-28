@@ -1,14 +1,12 @@
-local augroup = vim.api.nvim_create_augroup
-local autocmd = vim.api.nvim_create_autocmd
+local TWO_SPACE_FILETYPES = {
+  "javascript", "typescript", "javascriptreact", "typescriptreact",
+  "html", "css", "scss", "json", "jsonc", "svelte", "vue",
+  "cpp",
+}
 
-local webdev_group = augroup("WebDevIndent", { clear = true })
-
-autocmd("FileType", {
-  group = webdev_group,
-  pattern = {
-    "javascript", "typescript", "javascriptreact", "typescriptreact",
-    "html", "css", "json", "svelte", "lua", "yaml", "markdown"
-  },
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("TwoSpaceIndent", { clear = true }),
+  pattern = TWO_SPACE_FILETYPES,
   callback = function()
     vim.opt_local.tabstop = 2
     vim.opt_local.softtabstop = 2
@@ -16,4 +14,3 @@ autocmd("FileType", {
     vim.opt_local.expandtab = true
   end,
 })
-

@@ -6,7 +6,6 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 
 | Item | Effect |
 | --- | --- |
-| `system/etc/acpi/` | F4, F5, F6 do nothing. `system/install.sh` skips acpid setup until these files exist. Event strings are needed; see `docs/hardware-cf-sv7.md` |
 | synclient decimal options | MinSpeed, MaxSpeed, AccelFactor, CircScrollDelta are not set anywhere. Values unknown |
 | Wallpaper `~/Downloads/png/eclipse.png` | Black background on a fresh machine (`i3/.config/i3/config:8`) |
 | hopes | `prefix t` and `prefix T` open an empty popup until `~/.cargo/bin/hopes` exists. Source unknown |
@@ -29,7 +28,7 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
 | `nvim/.config/nvim/lua/plugins/markdown.lua` | 14 | Port 8081 |
 | `nvim/.config/nvim/lua/plugins/ipynb-peek.lua`, `md-peek.lua` | 4 | Local dev path `~/Github/...` (used only when `use_local_dev = true`) |
-| `nvim/.config/nvim/lua/callo/set.lua` | 34 | `shell = "/bin/bash"` |
+| `nvim/.config/nvim/lua/callo/set.lua` | 37 | `shell = "/bin/bash"` |
 | `git/.gitconfig` | 3 | Email `carlosranara0@gmail.com` |
 | `git/.gitconfig` | 6 | `credential.helper = store` saves tokens in plain text in `~/.git-credentials` |
 | `rofi/.config/rofi/themes/*.rasi` | font line | `Cartograph CF 12`, not installed. These themes are unused |
@@ -39,7 +38,7 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 
 | Item | Reason |
 | --- | --- |
-| `nvim/.config/nvim/lua/callo/remap.lua:24,33` | `<leader>s` and `<leader>j` are prefixes of spell (`<leader>ss`) and iron.nvim (`<leader>j*`) keys, so they wait for `timeoutlen`. Kept to avoid changing muscle memory |
+| `nvim/.config/nvim/lua/callo/remap.lua:23,32` | `<leader>s` and `<leader>j` are prefixes of spell (`<leader>ss`) and iron.nvim (`<leader>j*`) keys, so they wait for `timeoutlen`. Kept to avoid changing muscle memory |
 | zsh and fish duplicate aliases and env | Different languages; no shared file format |
 | `fconv` and `git-purge` duplicate the `die`, `info`, `success` helpers | Scripts stay standalone and portable |
 | `discord/nocturnal-mod-old.theme.css` | Imports remote CSS from `xcruxiex.github.io` and `discordstyles.github.io`. Needed by the theme |

@@ -3,6 +3,9 @@ vim.g.loaded_node_provider    = 0
 vim.g.loaded_perl_provider    = 0
 vim.g.loaded_ruby_provider    = 0
 
+vim.g.go_recommended_style   = 0
+vim.g.yaml_recommended_style = 0
+
 vim.opt.tabstop     = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth  = 4

@@ -29,7 +29,7 @@ sudo dnf copr enable -y scottames/ghostty
 X11 session (i3, polybar, system):
 
 ```bash
-sudo dnf install -y xorg-x11-server-Xorg xorg-x11-xinit xrdb xsetroot xrandr xorg-x11-drv-synaptics-legacy
+sudo dnf install -y xorg-x11-server-Xorg xorg-x11-xinit xrdb xsetroot xrandr xev xorg-x11-drv-synaptics-legacy
 ```
 
 KDE X11 session (optional, only to keep Plasma on X11). If dnf reports a file conflict with `kmime`, remove the old `kmime` package first:
@@ -88,7 +88,7 @@ Power, video, hardware. Do not install `tlp`. If `tuned-ppd` is installed it con
 
 ```bash
 rpm -q tuned-ppd && sudo dnf swap -y tuned-ppd power-profiles-daemon
-sudo dnf install -y power-profiles-daemon thermald acpid libva-utils
+sudo dnf install -y power-profiles-daemon thermald libva-utils
 sudo dnf install -y intel-media-driver
 ```
 
@@ -115,7 +115,7 @@ sudo dnf install -y tmux xclip fzf
 nvim:
 
 ```bash
-sudo dnf install -y neovim tree-sitter-cli ripgrep fd-find luarocks xclip ruff python3-ipython python3-jupytext java-latest-openjdk-devel nodejs24 nodejs24-bin nodejs24-npm nodejs24-npm-bin
+sudo dnf install -y neovim tree-sitter-cli ripgrep fd-find luarocks xclip ruff python3-ipython python3-jupytext gdb delve nodejs24 nodejs24-bin nodejs24-npm nodejs24-npm-bin
 ```
 
 scripts:
@@ -140,19 +140,29 @@ curl -fsSL https://bun.sh/install | bash
 curl -fsSL https://opencode.ai/install | bash
 curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
 rustup-init -y
-~/.cargo/bin/rustup component add clippy
-mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
+~/.cargo/bin/mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
 npm install -g prettier eslint_d
 ```
 
 gradle: not in Fedora. Download from https://services.gradle.org/distributions/ or use SDKMAN (UNVERIFIED).
+
+Debug adapters (same recipe on every distro, paths match `nvim/.config/nvim/lua/plugins/dap.lua`):
+
+```bash
+python3 -m venv ~/.local/share/nvim/debugpy
+~/.local/share/nvim/debugpy/bin/pip install debugpy
+mkdir -p ~/.local/share/nvim
+curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz | tar -xz -C ~/.local/share/nvim
+curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz | tar -xz -C ~/.local/share
+ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg
+```
 
 `hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
 
 ## 5. Services
 
 ```bash
-sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald acpid
+sudo systemctl enable --now NetworkManager bluetooth power-profiles-daemon thermald
 systemctl --user enable --now pipewire pipewire-pulse wireplumber
 ```
 
@@ -188,7 +198,7 @@ stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar r
 
 ## 9. System files
 
-Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files. Prints `no etc/acpi in repo; skipped acpid setup` until `system/etc/acpi/` exists (see `docs/known-issues.md`).
+Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files.
 
 ```bash
 ~/Dotfiles/system/install.sh
@@ -235,7 +245,7 @@ autorandr --save laptop
 | `echo $SHELL` | `/usr/bin/zsh` |
 | `i3lock --help 2>&1 \| grep -c -- --clock` | a number above 0 (i3lock-color). Output format UNVERIFIED |
 | `pactl info \| grep 'Server Name'` | `Server Name: PulseAudio (on PipeWire ...)` |
-| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald acpid` | `active` five times |
+| `systemctl is-active NetworkManager bluetooth power-profiles-daemon thermald` | `active` four times |
 | `rpm -q tlp tuned-ppd pulseaudio` | `package ... is not installed` for each |
 | `powerprofilesctl get` | `balanced` |
 | `vainfo 2>&1 \| grep -i 'driver version'` | contains `Intel iHD driver` |

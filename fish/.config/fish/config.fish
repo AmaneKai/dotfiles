@@ -16,7 +16,6 @@ fish_add_path -g \
     $HOME/.cargo/bin \
     $DOTFILES/bin \
     $HOME/.local/bin \
-    $HOME/.local/share/nvim/mason/bin \
     $HOME/.npm-global/bin \
     $HOME/.bun/bin \
     $HOME/.ghcup/bin \
