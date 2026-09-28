@@ -3,9 +3,18 @@
 readonly LOCK_IMAGE="/tmp/lock_screen.png"
 readonly LOCK_GENERATOR="$HOME/.config/i3/scripts/lock-gen.py"
 readonly FONT="JetBrainsMono Nerd Font"
+readonly BACKGROUND_COLOR="191724"
+
+background_args=(-c "$BACKGROUND_COLOR")
+
+generate_blurred_screenshot() {
+  rm -f "$LOCK_IMAGE"
+  python3 "$LOCK_GENERATOR" "$LOCK_IMAGE" 2>/dev/null
+  [[ -s "$LOCK_IMAGE" ]] && background_args+=(--image "$LOCK_IMAGE")
+}
 
 lock_with_i3lock_color() {
-  i3lock "$@" --image "$LOCK_IMAGE" \
+  i3lock "$@" "${background_args[@]}" \
     --clock \
     --time-str="%H:%M" \
     --date-str="%A, %B %d" \
@@ -37,14 +46,9 @@ lock_with_i3lock_color() {
 }
 
 lock_with_plain_i3lock() {
-  i3lock "$@" --image "$LOCK_IMAGE"
+  i3lock "$@" "${background_args[@]}"
 }
 
-if [[ ! -f "$LOCK_GENERATOR" ]]; then
-  notify-send "Lock" "Lock screen generator not found"
-  exit 1
-fi
-
-python3 "$LOCK_GENERATOR" "$LOCK_IMAGE"
+generate_blurred_screenshot
 lock_with_i3lock_color "$@" || lock_with_plain_i3lock "$@"
 rm -f "$LOCK_IMAGE"
