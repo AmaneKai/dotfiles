@@ -10,6 +10,7 @@
 # --- Configuration ---
 SEARCH_PATHS=(
     "$HOME/Dotfiles"
+    "$HOME/i3-dotfiles/"
     "$HOME/Github"
     "$HOME/Codes"
     "$HOME/College"
