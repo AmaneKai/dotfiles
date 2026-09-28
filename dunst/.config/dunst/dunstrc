@@ -3,10 +3,18 @@
     markup               = full
     format               = "<b>%s</b>\n<span alpha='80%%'>%b</span>"
 
-    corner_radius        = 14
-    icon_corner_radius   = 100
+    corner_radius        = 0
+    icon_corner_radius   = 0
     gap_size             = 8
-    frame_width          = 0
+    frame_width          = 1
+    frame_color          = "#26233a"
+
+    progress_bar                 = true
+    progress_bar_height          = 6
+    progress_bar_frame_width     = 0
+    progress_bar_corner_radius   = 0
+    progress_bar_min_width       = 240
+    progress_bar_max_width       = 320
 
     origin               = top-right
     offset               = 20x20
@@ -33,6 +41,7 @@
 [urgency_low]
     background           = "#1f1d2e"
     foreground           = "#e0def4"
+    highlight            = "#9ccfd8"
     format               = "<span foreground='#9ccfd8'>●</span>  <b>%s</b>\n<span alpha='75%%'>%b</span>"
     timeout              = 4
 
@@ -47,6 +56,11 @@
     foreground           = "#e0def4"
     format               = "<span foreground='#eb6f92'>●</span>  <b>%s</b>\n<span alpha='75%%'>%b</span>"
     timeout              = 0
+
+[osd]
+    appname              = osd
+    format               = "%s"
+    timeout              = 2
 
 [shortcuts]
     close                = ctrl+space

@@ -12,10 +12,12 @@ i3 (X11) desktop, shell, and editor configs for Arch, Fedora, and the Debian fam
 | fish | fish shell | `~/.config/fish/config.fish` |
 | ghostty | ghostty terminal | `~/.config/ghostty/config` |
 | git | git user and aliases | `~/.gitconfig` |
-| i3 | window manager, audio and bluetooth menus, lock image generator | `~/.config/i3/` |
+| gtk | GTK 2/3/4 theme, icons, cursor | `~/.config/gtk-3.0/`, `~/.config/gtk-4.0/`, `~/.gtkrc-2.0`, `~/.icons/default/` |
+| i3 | window manager, audio, bluetooth and power menus, OSD, lock image generator | `~/.config/i3/` |
 | i3lock | lock screen script | `~/bin/lock.sh` |
 | nmdmenu | networkmanager-dmenu | `~/.config/networkmanager-dmenu/config.ini` |
 | nvim | Neovim | `~/.config/nvim/` |
+| picom | compositor: vsync, shadows, fades | `~/.config/picom/picom.conf` |
 | polybar | status bar | `~/.config/polybar/` |
 | rofi | launcher theme | `~/.config/rofi/` |
 | scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore | `~/.local/bin/` |
@@ -31,7 +33,7 @@ Not stowed: `bin/` (added to PATH by zsh and fish), `system/` (copied to `/etc` 
 
 1. Install packages for your distro: [Arch](docs/install-arch.md), [Fedora](docs/install-fedora.md), [Debian family](docs/install-debian.md).
 2. Clone and check out `linux`. `~/Dotfiles` is the default location; zsh, fish and tmux resolve the real path from the symlinks.
-3. Run `mkdir -p ~/.config ~/.local/bin ~/bin`.
+3. Run `mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons`.
 4. From `~/Dotfiles`, run `stow <packages>`.
 5. Run `~/Dotfiles/system/install.sh`.
 6. Reboot and run `startx`.

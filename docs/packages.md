@@ -56,6 +56,8 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | debugpy | `python3 -m venv ~/.local/share/nvim/debugpy && ~/.local/share/nvim/debugpy/bin/pip install debugpy` |
 | js-debug | `curl -fsSL https://github.com/microsoft/vscode-js-debug/releases/download/v1.140.0/js-debug-dap-v1.140.0.tar.gz \| tar -xz -C ~/.local/share/nvim` (creates `js-debug/`) |
 | netcoredbg | `curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcoredbg-linux-amd64.tar.gz \| tar -xz -C ~/.local/share && ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg` |
+| Rose Pine GTK theme | `mkdir -p ~/.themes && curl -fsSL https://github.com/rose-pine/gtk/releases/download/v2.2.0/gtk3.tar.gz \| tar -xz --strip-components=1 -C ~/.themes gtk3/rose-pine-gtk` |
+| Rose Pine cursor | `mkdir -p ~/.icons && curl -fsSL https://github.com/rose-pine/cursor/releases/download/v1.1.0/BreezeX-RosePine-Linux.tar.xz \| tar -xJ -C ~/.icons` |
 | networkmanager_dmenu | `$mod+n` | `i3/.config/i3/config` | networkmanager-dmenu | manual | manual |
 | maim | screenshots, lock image | `i3/.config/i3/config`, `i3/.config/i3/scripts/lock-gen.py` | maim | maim | maim |
 | xclip | screenshot to clipboard | `i3/.config/i3/config` | xclip | xclip | xclip |
@@ -90,6 +92,16 @@ Where Debian and Ubuntu names differ, the cell reads `trixie / noble`.
 | WirePlumber | session manager, wpctl | `i3/.config/i3/config` | wireplumber | wireplumber | wireplumber |
 
 Do not install `pulseaudio` alongside `pipewire-pulse`. They conflict.
+
+## Look (gtk, picom packages)
+
+| Tool | Used by | Where | Arch | Fedora | Debian family |
+| --- | --- | --- | --- | --- | --- |
+| picom | compositor, started by i3 | `picom/.config/picom/picom.conf`, `i3/.config/i3/config` | picom | picom | picom |
+| Rose Pine GTK theme `rose-pine-gtk` | GTK apps | `gtk/.config/gtk-3.0/settings.ini`, `gtk/.gtkrc-2.0` | rose-pine-gtk-theme (AUR) | manual | manual |
+| Rose Pine cursor `BreezeX-RosePine-Linux` | cursor | `gtk/.icons/default/index.theme`, `xresources/.Xresources` | rose-pine-cursor (AUR) | manual | manual |
+| Papirus icons `Papirus-Dark` | GTK icons, dunst | `gtk/.config/gtk-3.0/settings.ini`, `dunst/.config/dunst/dunstrc` | papirus-icon-theme | papirus-icon-theme | papirus-icon-theme |
+| powerprofilesctl | polybar battery click, `osd.sh profile` | `i3/.config/i3/scripts/osd.sh` | power-profiles-daemon | power-profiles-daemon | power-profiles-daemon |
 
 ## Fonts
 

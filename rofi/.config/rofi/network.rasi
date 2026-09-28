@@ -1,0 +1,17 @@
+@import "default"
+
+* {
+    font:                       "JetBrainsMono Nerd Font 11";
+
+    background:                 #191724;
+    foreground:                 #e0def4;
+    lightbg:                    #1f1d2e;
+    lightfg:                    #6e6a86;
+    red:                        #eb6f92;
+    blue:                       #9ccfd8;
+
+    border-color:               #6e6a86;
+    separatorcolor:             #6e6a86;
+    selected-normal-background: #403d52;
+    selected-normal-foreground: #e0def4;
+}

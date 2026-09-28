@@ -13,6 +13,15 @@ device_is_connected() {
     bluetoothctl info "$1" | grep -q "Connected: yes"
 }
 
+device_is_paired() {
+    bluetoothctl info "$1" | grep -q "Paired: yes"
+}
+
+pair_if_needed() {
+    device_is_paired "$1" && return 0
+    bluetoothctl pair "$1" && bluetoothctl trust "$1"
+}
+
 device_name() {
     bluetoothctl info "$1" | grep -m1 "Name:" | sed 's/.*Name: //'
 }
@@ -68,7 +77,7 @@ main() {
             ;;
         connect)
             notify "󰂯" "Connecting..."
-            if bluetoothctl connect "$value"; then
+            if pair_if_needed "$value" && bluetoothctl connect "$value"; then
                 notify "󰂱" "Connected to $(device_name "$value")"
             else
                 notify "󰂯" "Failed to connect"

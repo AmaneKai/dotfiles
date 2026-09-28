@@ -9,7 +9,6 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | synclient decimal options | MinSpeed, MaxSpeed, AccelFactor, CircScrollDelta are not set anywhere. Values unknown |
 | Wallpaper `~/Downloads/png/eclipse.png` | Black background on a fresh machine (`i3/.config/i3/config:8`) |
 | hopes | `prefix t` and `prefix T` open an empty popup until `~/.cargo/bin/hopes` exists. Source unknown |
-| picom | Not configured. No compositor runs |
 
 ## Hardcoded values
 

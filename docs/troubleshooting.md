@@ -35,6 +35,18 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | `$mod+Shift+d` says earbuds not connected | No Bluetooth audio card in `pactl list cards short` | Connect the headset first (`$mod+Shift+b`) |
 | `$mod+Shift+f` says mic not connected | No sink with `FIFINE` in its name | Plug in the mic, check `pactl list sinks short` |
 
+## Look and menus
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Screen tearing, no shadows | picom not installed or not running | Install picom, check `pgrep -a picom`, start it with `picom -b` |
+| Battery drains faster with picom | Compositing keeps the GPU busy | `pkill picom`. Fullscreen video already bypasses it (`unredir-if-possible`) |
+| Cursor still the default arrow | Cursor theme not installed, or X not restarted | Install the Rose Pine cursor, then log out and run `startx` again |
+| GTK apps not themed | `rose-pine-gtk` not installed | Install the theme; check `~/.config/gtk-3.0/settings.ini` is a link into the repo |
+| Volume or brightness keys show no popup | dunst not running | `pgrep dunst`; reload with `dunstctl reload` |
+| `$mod+Shift+e` does nothing | rofi missing | Install rofi; the menu is `i3/.config/i3/scripts/power-menu.sh` |
+| Clicking `bat` in polybar does nothing | power-profiles-daemon not running | `systemctl enable --now power-profiles-daemon` |
+
 ## Bluetooth
 
 | Symptom | Cause | Fix |

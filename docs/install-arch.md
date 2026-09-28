@@ -10,12 +10,14 @@ sudo pacman -Syu --needed git stow base-devel curl tar unzip gzip
 
 ## 2. Extra repos
 
-AUR. No helper assumed. `i3lock-color` replaces `i3lock` (it provides and conflicts with it). Without it the lock screen does not work.
+AUR. No helper assumed; with `yay` installed, `yay -S i3lock-color python-jupytext rose-pine-gtk-theme rose-pine-cursor` does the same. `i3lock-color` replaces `i3lock` (it provides and conflicts with it). Without it the lock screen does not work.
 
 ```bash
 mkdir -p ~/aur && cd ~/aur
 git clone https://aur.archlinux.org/i3lock-color.git && (cd i3lock-color && makepkg -si)
 git clone https://aur.archlinux.org/python-jupytext.git && (cd python-jupytext && makepkg -si)
+git clone https://aur.archlinux.org/rose-pine-gtk-theme.git && (cd rose-pine-gtk-theme && makepkg -si)
+git clone https://aur.archlinux.org/rose-pine-cursor.git && (cd rose-pine-cursor && makepkg -si)
 ```
 
 Optional, ghcup from AUR instead of its installer:
@@ -41,7 +43,7 @@ sudo pacman -S --needed pipewire pipewire-pulse wireplumber libpulse
 i3:
 
 ```bash
-sudo pacman -S --needed i3-wm feh autorandr util-linux autotiling dex dunst xss-lock wezterm pcmanfm rofi networkmanager networkmanager-dmenu maim xclip brightnessctl libnotify mpv bluez bluez-utils python python-pillow python-numpy papirus-icon-theme
+sudo pacman -S --needed i3-wm feh autorandr util-linux autotiling dex dunst xss-lock wezterm pcmanfm rofi picom networkmanager networkmanager-dmenu maim xclip brightnessctl libnotify mpv bluez bluez-utils python python-pillow python-numpy papirus-icon-theme
 ```
 
 polybar:
@@ -155,11 +157,11 @@ git checkout linux
 Create the parent directories first so stow links files, not whole directories. Otherwise installers that write to `~/.local/bin` or `~/bin` write into the repo. Move existing shell and X start files out of the way.
 
 ```bash
-mkdir -p ~/.config ~/.local/bin ~/bin
+mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
 mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xinit xresources zsh
+stow autorandr dunst fastfetch fish ghostty git gtk i3 i3lock nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files
@@ -206,6 +208,8 @@ autorandr --save laptop
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
 | `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
+| `pgrep -a picom` | a running `picom -b` |
+| `readlink ~/.config/gtk-3.0/settings.ini` | `../../Dotfiles/gtk/.config/gtk-3.0/settings.ini` |
 | `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |
 | `echo $SHELL` | `/usr/bin/zsh` |

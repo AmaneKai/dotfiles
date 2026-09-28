@@ -47,7 +47,7 @@ sudo dnf install -y pipewire pipewire-pulseaudio wireplumber pulseaudio-utils
 i3:
 
 ```bash
-sudo dnf install -y i3 feh autorandr util-linux dex-autostart dunst xss-lock wezterm pcmanfm rofi NetworkManager maim xclip brightnessctl libnotify mpv bluez python3 python3-pillow python3-numpy papirus-icon-theme python3-gobject NetworkManager-libnm pipx
+sudo dnf install -y i3 feh autorandr util-linux dex-autostart dunst xss-lock wezterm pcmanfm rofi picom NetworkManager maim xclip brightnessctl libnotify mpv bluez python3 python3-pillow python3-numpy papirus-icon-theme python3-gobject NetworkManager-libnm pipx
 pipx install autotiling
 sudo curl -fsSL -o /usr/local/bin/networkmanager_dmenu https://raw.githubusercontent.com/firecat53/networkmanager-dmenu/main/networkmanager_dmenu
 sudo chmod +x /usr/local/bin/networkmanager_dmenu
@@ -146,6 +146,14 @@ npm install -g prettier eslint_d
 
 gradle: not in Fedora. Download from https://services.gradle.org/distributions/ or use SDKMAN (UNVERIFIED).
 
+Rose Pine GTK theme and cursor (not packaged):
+
+```bash
+mkdir -p ~/.themes ~/.icons
+curl -fsSL https://github.com/rose-pine/gtk/releases/download/v2.2.0/gtk3.tar.gz | tar -xz --strip-components=1 -C ~/.themes gtk3/rose-pine-gtk
+curl -fsSL https://github.com/rose-pine/cursor/releases/download/v1.1.0/BreezeX-RosePine-Linux.tar.xz | tar -xJ -C ~/.icons
+```
+
 Debug adapters (same recipe on every distro, paths match `nvim/.config/nvim/lua/plugins/dap.lua`):
 
 ```bash
@@ -189,11 +197,11 @@ git checkout linux
 Create the parent directories first so stow links files, not whole directories. Otherwise installers that write to `~/.local/bin` or `~/bin` write into the repo. Move existing shell and X start files out of the way.
 
 ```bash
-mkdir -p ~/.config ~/.local/bin ~/bin
+mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
 mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xinit xresources zsh
+stow autorandr dunst fastfetch fish ghostty git gtk i3 i3lock nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files
@@ -240,6 +248,8 @@ autorandr --save laptop
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
 | `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
+| `pgrep -a picom` | a running `picom -b` |
+| `readlink ~/.config/gtk-3.0/settings.ini` | `../../Dotfiles/gtk/.config/gtk-3.0/settings.ini` |
 | `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |
 | `echo $SHELL` | `/usr/bin/zsh` |
