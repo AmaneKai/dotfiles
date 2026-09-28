@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 
-################################################################################
-# GIT-PURGE - Synchronized Branch Deletion (Local & Remote)
-################################################################################
-# Usage: git purge <branch_name> [remote_name]
-################################################################################
-
 BRANCH=$1
 REMOTE=${2:-origin}
 
-# UI Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -19,11 +12,9 @@ die() { echo -e "${RED}✖ Error: $1${NC}" >&2; exit 1; }
 info() { echo -e "${BLUE}➜ $1${NC}"; }
 success() { echo -e "${GREEN}✔ $1${NC}"; }
 
-# 1. Validation
 [[ -z "$BRANCH" ]] && die "No branch name provided. Usage: git purge <branch>"
 ! git rev-parse --is-inside-work-tree &>/dev/null && die "Not a git repository."
 
-# 2. Safety: Don't delete the current branch
 CURRENT_BRANCH=$(git branch --show-current)
 if [[ "$BRANCH" == "$CURRENT_BRANCH" ]]; then
     die "Cannot purge the branch you are currently on. Switch to main/master first."
@@ -31,8 +22,6 @@ fi
 
 info "Initiating purge of branch: $BRANCH"
 
-# 3. Handle Remote Deletion
-# Check if branch exists on remote before trying to delete
 if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" &>/dev/null; then
     info "Deleting remote branch from $REMOTE..."
     git push "$REMOTE" --delete "$BRANCH" || die "Failed to delete remote branch."
@@ -41,10 +30,8 @@ else
     echo "ℹ Remote branch '$BRANCH' not found on $REMOTE. Skipping..."
 fi
 
-# 4. Handle Local Deletion
 if git branch --list | grep -q "$BRANCH"; then
     info "Deleting local branch..."
-    # Using -D to force delete (standard for a 'purge' command)
     git branch -D "$BRANCH" || die "Failed to delete local branch."
     success "Local branch purged."
 else

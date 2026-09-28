@@ -1,14 +1,10 @@
-# font settings
 font-family = jetbrains mono
 font-size = 14
-# colors
-theme = Rose Pine 
+theme = Rose Pine
 foreground = #ffffff
 background = #121212
 background-opacity = 0.95
 background-blur = 8
-# window settings
 window-padding-x = 10
 window-padding-y = 10
-# appearance
 cursor-style = block

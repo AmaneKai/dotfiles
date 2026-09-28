@@ -1,230 +1,179 @@
-# Neovim Configuration
+# Neovim
 
-## Overview
-
-LSP-enabled setup with fuzzy finding, git integration, and database tools.
+Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local leader: `\`. No LSP; debugging through nvim-dap. External tools: see `docs/packages.md`.
 
 ## Plugins
 
-### Core
-- **lazy.nvim** - Plugin manager
-- **plenary.nvim** - Lua utility library
+| Plugin | Purpose | Spec |
+| --- | --- | --- |
+| folke/lazy.nvim | plugin manager | `lua/callo/lazy.lua` |
+| nvim-lua/plenary.nvim | library | `lua/plugins/init.lua` |
+| mfussenegger/nvim-dap, rcarriga/nvim-dap-ui, nvim-neotest/nvim-nio | debugger, UI | `lua/plugins/dap.lua` |
+| mfussenegger/nvim-dap-python, leoluz/nvim-dap-go | Python, Go debug configs | `lua/plugins/dap.lua` |
+| saghen/blink.cmp, friendly-snippets, blink-cmp-spell | completion (path, snippets, buffer) | `lua/plugins/blink.lua` |
+| stevearc/conform.nvim | formatting | `lua/plugins/conform.lua` |
+| nvim-treesitter/nvim-treesitter (`main`) | parsers, highlight | `lua/plugins/treesitter.lua` |
+| nvim-telescope/telescope.nvim | fuzzy finder | `lua/plugins/telescope.lua` |
+| ThePrimeagen/harpoon (`harpoon2`) | file marks | `lua/plugins/harpoon.lua` |
+| tpope/vim-fugitive | git | `lua/plugins/fugitive.lua` |
+| mbbill/undotree | undo tree | `lua/plugins/undotree.lua` |
+| windwp/nvim-autopairs, nvim-ts-autotag | brackets, HTML tags | `lua/plugins/autopairs.lua` |
+| mattn/emmet-vim | HTML expansion | `lua/plugins/emmet.lua` |
+| NvChad/nvim-colorizer.lua | color previews | `lua/plugins/tailwind.lua` |
+| rose-pine/neovim, folke/tokyonight.nvim | colorschemes (rose-pine active) | `lua/plugins/colors.lua` |
+| Vigemus/iron.nvim, goerz/jupytext.vim | Python REPL, notebooks as `.py` | `lua/plugins/python.lua` |
+| AmaneKai/ipynb-peek.nvim | notebook preview | `lua/plugins/ipynb-peek.lua` |
+| AmaneKai/md-peek.nvim | Markdown preview | `lua/plugins/md-peek.lua` |
+| iamcco/markdown-preview.nvim | Markdown preview in browser | `lua/plugins/markdown.lua` |
+| chomosuke/typst-preview.nvim | Typst preview | `lua/plugins/typst.lua` |
+| barrettruth/live-server.nvim | HTML live reload | `lua/plugins/liveserver.lua` |
+| spell-config (local) | spell check for prose | `lua/plugins/spell.lua` |
 
-### LSP & Completion
-- **nvim-lspconfig** - LSP client configurations
-- **mason.nvim** - LSP/tool installer
-- **mason-lspconfig.nvim** - Mason + lspconfig bridge
-- **nvim-cmp** - Completion engine
-- **cmp-nvim-lsp** - LSP source for nvim-cmp
-- **cmp-buffer** - Buffer text completion
-- **cmp-path** - File path completion
-- **cmp-cmdline** - Command line completion
-- **LuaSnip** - Snippet engine
-- **nvim-jdtls** - Java LSP (custom ftplugin)
+## Languages
 
-### Syntax & UI
-- **nvim-treesitter** - Syntax highlighting
-- **nvim-ts-autotag** - Auto-close HTML/JSX tags
-- **nvim-autopairs** - Auto-close brackets (disabled for most languages)
-- **rose-pine** - Color scheme (default)
-- **tokyonight.nvim** - Alternative color scheme
+| Language | Debug adapter | Formatter | Indent |
+| --- | --- | --- | --- |
+| C | gdb (`gdb --interpreter=dap`) | none | 4 spaces |
+| C++ | gdb | none | 2 spaces |
+| Rust | gdb | none | 4 spaces |
+| Python | debugpy (nvim-dap-python) | ruff_format | 4 spaces |
+| Go | delve (nvim-dap-go) | none | 4 spaces |
+| JavaScript, TypeScript | js-debug (`pwa-node`) | eslint_d | 2 spaces |
+| C# | netcoredbg | none | 4 spaces |
+| Svelte | none | prettier, eslint_d | 2 spaces |
+| HTML, CSS, JSON | none | prettier | 2 spaces |
+| Markdown | none | prettier | 4 spaces |
+| everything else (Java included) | none | none | 4 spaces |
 
-### Navigation
-- **telescope.nvim** - Fuzzy finder
-- **telescope-fzf-native.nvim** - Better sorting
-- **harpoon** - Quick file navigation
-- **undotree** - Undo history visualizer
+Adapter locations:
 
-### Git
-- **vim-fugitive** - Git wrapper
+| Adapter | Expected at |
+| --- | --- |
+| gdb, delve (`dlv`), netcoredbg, node | on `PATH` |
+| js-debug | `~/.local/share/nvim/js-debug/src/dapDebugServer.js` |
+| debugpy | `~/.local/share/nvim/debugpy/bin/python` venv, else system `python3` with debugpy |
 
-### Development Tools
-- **vim-dadbod** - Database interface
-- **vim-dadbod-ui** - Database UI
-- **vim-dadbod-completion** - SQL completion
-- **live-server.nvim** - HTML live reload
-- **emmet-vim** - HTML/CSS expansion
-- **peek.nvim** - Markdown preview with mermaid support
+Launch configs: C, C++, Rust and C# prompt for the program path (C# starts in `bin/Debug/`). JavaScript and TypeScript launch the current file or attach to a process. Python and Go use the configs from nvim-dap-python and nvim-dap-go.
 
-### Utilities
-- **plenary.nvim** - Javadoc generator (custom)
+Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html, css, tsx, json, go, markdown, markdown_inline, kotlin, svelte, python.
 
-## Keybindings
+## Keymaps: general
 
-Leader key: `<Space>`
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>pv` | n | netrw explorer |
+| `<leader>pr` | n | netrw at cwd |
+| `<leader>nf` | n | new file relative to current file |
+| `<leader>nF` | n | new file from cwd |
+| `J`, `K` | v | move selection down, up |
+| `J` | n | join lines, keep cursor |
+| `<C-d>`, `<C-u>`, `n`, `N` | n | scroll or search, centered |
+| `<leader>p` | x | paste without yanking |
+| `<leader>y`, `<leader>Y` | n, v | yank to clipboard |
+| `<leader>d` | n, v | delete to void register |
+| `<C-c>` | i | Esc |
+| `<leader>s` | n | substitute word under cursor |
+| `<leader>x` | n | `chmod +x` current file |
+| `<leader>nh` | n | clear search highlight |
+| `<leader>+`, `<leader>-` | n | increment, decrement |
+| `<C-k>`, `<C-j>` | n | quickfix next, prev |
+| `<leader>k`, `<leader>j` | n | location list next, prev |
+| `<leader>ee` | n | Go `if err != nil` snippet |
+| `<leader><leader>` | n | source current file |
+| `<leader>tt` | n | terminal split |
+| `<leader>gr`, `<leader>gb`, `<leader>gt` | n | `./gradlew` run, build, test |
+| `<leader>u` | n | undotree |
+| `<leader>f` | n | format with conform |
 
-### General Navigation
+## Keymaps: navigation
+
 | Key | Action |
-|-----|--------|
-| `<leader>pv` | File explorer |
-| `<leader>pr` | Project root explorer |
-| `<leader>nf` | New file (relative) |
-| `<leader>nF` | New file (from root) |
-| `<C-d>` | Half page down (centered) |
-| `<C-u>` | Half page up (centered) |
-| `n` | Next search (centered) |
-| `N` | Previous search (centered) |
+| --- | --- |
+| `<leader>pf` | find files |
+| `<C-p>` | git files |
+| `<leader>ps` | live grep |
+| `<leader>pws` | grep word under cursor |
+| `<leader>pb` | buffers |
+| `<leader>vh` | help tags |
+| `<leader>a` | harpoon add |
+| `<C-e>` | harpoon menu |
+| `<C-h>`, `<C-n>`, `<C-s>`, `<C-t>` | harpoon 1 to 4 |
 
-### Telescope
+## Keymaps: debug
+
 | Key | Action |
-|-----|--------|
-| `<leader>pf` | Find files |
-| `<C-p>` | Git files |
-| `<leader>ps` | Live grep |
-| `<leader>pws` | Grep word under cursor |
-| `<leader>pWs` | Grep WORD under cursor |
-| `<leader>pb` | Find buffers |
-| `<leader>vh` | Help tags |
+| --- | --- |
+| `<leader>b` | toggle breakpoint |
+| `<leader>B` | conditional breakpoint |
+| `<leader>cc` | start or continue |
+| `<leader>cn` | step over |
+| `<leader>ci` | step into |
+| `<leader>co` | step out |
+| `<leader>cl` | run last config |
+| `<leader>cq` | stop |
+| `<leader>cr` | toggle REPL |
+| `<leader>cu` | toggle UI (opens and closes automatically with the session) |
 
-### LSP
+## Keymaps: git
+
 | Key | Action |
-|-----|--------|
-| `gd` | Go to definition |
-| `K` | Hover documentation |
-| `<leader>vws` | Workspace symbol |
-| `<leader>vd` | Show diagnostics |
-| `[d` | Next diagnostic |
-| `]d` | Previous diagnostic |
-| `<leader>ca` | Code actions |
-| `<leader>vrr` | References |
-| `<leader>vrn` | Rename |
-| `<leader>f` | Format |
-| `<C-h>` | Signature help (insert mode) |
+| --- | --- |
+| `<leader>gs` | fugitive status |
+| `<leader>p` | push (fugitive buffer) |
+| `<leader>P` | pull --rebase (fugitive buffer) |
+| `<leader>t` | `:Git push -u origin ` (fugitive buffer) |
+| `gu`, `gh` | diffget left, right |
 
-### Harpoon
-| Key | Action |
-|-----|--------|
-| `<leader>a` | Add file to harpoon |
-| `<C-e>` | Toggle harpoon menu |
-| `<C-h>` | Navigate to mark 1 |
-| `<C-n>` | Navigate to mark 2 |
-| `<C-s>` | Navigate to mark 3 |
-| `<C-t>` | Navigate to mark 4 |
+## Keymaps: previews and REPL
 
-### Git (Fugitive)
-| Key | Action |
-|-----|--------|
-| `<leader>gs` | Git status |
-| `<leader>p` | Git push (in fugitive buffer) |
-| `<leader>P` | Git pull --rebase (in fugitive buffer) |
-| `<leader>t` | Git push -u origin (in fugitive buffer) |
-| `gu` | Accept left (merge conflict) |
-| `gh` | Accept right (merge conflict) |
-
-### Mermaid
-| Key | Action |
-|-----|--------|
-| `<leader>mm` | Open browser to preview mermaid/markdown files |
-
-### Typst
-| Key | Action |
-|-----|--------|
-| `<leader>mt` | Toggle typst preview |
-
-
-### Markdown
-| Key | Action |
-|-----|--------|
-| `<leader>md` | Toggle markdown preview |
-
-### Gradle
-| Key | Action |
-|-----|--------|
-| `<leader>gr` | Gradle run |
-| `<leader>gb` | Gradle build |
-| `<leader>gt` | Gradle test |
-
-### Utility
-| Key | Action |
-|-----|--------|
-| `<leader>u` | Toggle undotree |
-| `<leader>nh` | Clear search highlights |
-| `<leader>tt` | Terminal at project root |
-| `<leader>zig` | Restart LSP |
-| `J` (visual) | Move selection down |
-| `K` (visual) | Move selection up |
-| `<leader>y` | Yank to system clipboard |
-| `<leader>d` | Delete to void register |
-| `<leader>s` | Search/replace word under cursor |
+| Key | Action | Scope |
+| --- | --- | --- |
+| `<leader>md` | markdown-preview toggle | Markdown |
+| `<leader>mo`, `<leader>mc`, `<leader>mp` | md-peek open, close, toggle | Markdown |
+| `<leader>mr`, `<leader>mm` | md-peek refresh, outline | Markdown |
+| `<leader>ty`, `<leader>tc`, `<leader>ts` | Typst preview start, stop, sync cursor | Typst |
+| `<leader>ls`, `<leader>lc` | live server start, stop | global |
+| `<leader>jj`, `<leader>jf` | iron send line, file | global |
+| `<leader>jr` | iron send selection (v) | global |
+| `<leader>jc`, `<leader>ja` | iron send `# %%` cell, all cells | global |
+| `<leader>jt`, `<leader>jo`, `<leader>jh` | iron toggle, open, hide REPL | global |
+| `<leader>jR`, `<leader>jq`, `<leader>jl` | iron restart, exit, clear | global |
+| `<leader>j<space>` | iron interrupt | global |
+| `<leader>io`, `<leader>ic`, `<leader>ir`, `<leader>iR`, `<leader>iK` | ipynb-peek open, close, run cell, run all, restart kernel | `.ipynb` |
+| `<leader>ss`, `<leader>sa`, `<leader>sc` | spell toggle, add word, suggest | typst, markdown, text, tex |
+| `<C-y>` | emmet leader | HTML, CSS, JS, JSX, TSX |
+| `<C-Space>` | completion menu, docs | insert |
 
 ## Settings
 
-### Editor
-- Line numbers: relative
-- Tab width: 1 space (expandtab)
-- Smart indent: enabled
-- Line wrap: disabled
-- Swap file: disabled
-- Undo file: enabled (~/.vim/undodir)
-- Scroll offset: 8 lines
-- Color column: 80
+| Option | Value |
+| --- | --- |
+| Indent | 4 spaces. 2 spaces for webdev (JS, TS, JSX, TSX, HTML, CSS, SCSS, JSON, Svelte, Vue) and C++. Go and YAML runtime styles disabled so they follow the rule |
+| Numbers | relative |
+| Color column | 100 |
+| Clipboard | `unnamedplus` |
+| Undo | persistent, `~/.vim/undodir` |
+| Swap, backup | off |
+| Shell | `/bin/bash` |
+| Providers | python3, node, perl, ruby disabled |
 
-### C/C++ Specific
-- Tab width: 1 space (actual tabs, not spaces)
-- cindent: enabled
-- Custom cinoptions for formatting
+## Auto-save
 
-## Language Support
-
-### Configured
-- **C/C++**: clangd
-- **Lua**: lua_ls (vim globals recognized)
-- **Java**: jdtls (per-project workspaces)
-
-### Via Treesitter
-- JavaScript, TypeScript, HTML, CSS, JSON, Rust, Bash, JSDoc, TSX
-
-## Color Scheme
-
-**Default**: rose-pine
-- Transparent background
-- Dark variant
-- No italics
-
-**Alternative**: tokyonight (storm)
-- Available via `:ColorScheme tokyonight`
-
-## File-Specific Features
-
-### Java
-- Automatic Javadoc generation
-- JDTLS with Maven/Gradle support
-- Lombok support (if lombok.jar found)
-- Per-project workspaces
-
-### Markdown
-- Live preview with mermaid diagram support
-- Auto-save on change
-
-### HTML/CSS/JS
-- Live server with auto-reload
-- Emmet expansion (Ctrl+y)
-- Auto-save on change
-- Auto-close tags
-
-### SQL
-- Database UI with connection management
-- Auto-completion
-- Query execution and saving
-- Result viewing
+| Files | Trigger |
+| --- | --- |
+| `*.html`, `*.css`, `*.js` | text change, insert leave |
+| `*.typ` | text change, insert leave |
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `:Mason` | Open LSP installer |
-| `:Lazy` | Open plugin manager |
-| `:ColorScheme [theme]` | Switch color scheme |
-| `:JdtStart` | Start Java LSP |
-| `:PeekRebuild` | Rebuild markdown previewer |
-| `:LiveServerStart` | Start HTML live server |
-| `:LiveServerStop` | Stop HTML live server |
-| `:DBUI` | Open database UI |
-
-## Notes
-
-- Autopairs disabled for most languages (enabled only for lua initially)
-- Telescope uses master branch (Neovim 0.11.5 compatibility)
-- Treesitter highlighting disabled in Telescope previews
-- Java LSP checks Mason first, falls back to system installation
-- Database queries auto-save to ~/sql_queries
+| Command | Action |
+| --- | --- |
+| `:Lazy` | plugin manager |
+| `:DapContinue` | start or continue debugging |
+| `:checkhealth` | diagnostics |
+| `:TSUpdate` | update parsers |
+| `:MarkdownPreviewToggle` | browser preview on port 8081 |
+| `:MdPeekOpen` | md-peek preview |
+| `:TypstPreview` | Typst preview |
+| `:LiveServerStart`, `:LiveServerStop` | live server on port 6767 |
+| `:IronRepl` | ipython REPL |

@@ -10,7 +10,6 @@ return {
         },
         check_ts = true,
       })
-      -- blink.cmp's completion.accept.auto_brackets handles bracket insertion on accept
     end,
   },
 

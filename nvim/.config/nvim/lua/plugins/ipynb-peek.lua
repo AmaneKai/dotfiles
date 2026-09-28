@@ -20,11 +20,11 @@ spec.config = function()
       },
     },
     keymaps = {
-      open = "<leader>jo",
-      close = "<leader>jc",
-      run_cell = "<leader>jr",
-      run_all = "<leader>jR",
-      restart_kernel = "<leader>jK",
+      open = "<leader>io",
+      close = "<leader>ic",
+      run_cell = "<leader>ir",
+      run_all = "<leader>iR",
+      restart_kernel = "<leader>iK",
     },
   })
 end

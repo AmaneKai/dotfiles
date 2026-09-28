@@ -1,54 +1,36 @@
 # Dotfiles
 
-Personal configuration files for Neovim, Zsh, Tmux, and Ghostty.
+Shell, terminal and editor configs for macOS, managed with GNU stow. The Linux setup lives on the `linux` branch. The two branches never merge.
 
-## Quick Start
+## Stow packages
 
-```bash
-# Clone repository
-git clone https://github.com/yourusername/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
+| Package | Configures | Target |
+| --- | --- | --- |
+| ghostty | ghostty terminal | `~/.config/ghostty/config` |
+| git | git user and aliases | `~/.gitconfig` |
+| nvim | Neovim | `~/.config/nvim/` |
+| scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore | `~/.local/bin/` |
+| tmux | tmux | `~/.tmux.conf` |
+| zsh | zsh with oh-my-zsh | `~/.zshrc` |
 
-# Install prerequisites (see links below)
-# Then symlink configs
-stow nvim zsh tmux ghostty
-```
+Not stowed: `bin/` (added to `PATH` by zsh), `discord/` (copy by hand).
 
-## Prerequisites
+## Quick start
 
-Install required packages for your OS:
+1. Install packages: [docs/install-macos.md](docs/install-macos.md).
+2. Clone to `~/Dotfiles`. zsh and tmux resolve the real path from the symlinks.
+3. Run `mkdir -p ~/.config ~/.local/bin`.
+4. From `~/Dotfiles`, run `stow ghostty git nvim scripts tmux zsh`.
+5. Run `exec zsh`, then start `nvim` once so lazy.nvim installs plugins.
+6. Run the verify table at the end of the install guide.
 
-- [Arch Linux](docs/INSTALLATION.md#arch-linux)
-- [Linux Mint](docs/INSTALLATION.md#linux-mint)
-- [Fedora](docs/INSTALLATION.md#fedora)
-- [macOS](docs/INSTALLATION.md#macos)
-- [Windows (WSL)](docs/INSTALLATION.md#windows-wsl)
+## Docs
 
-## What's Included
-
-- **Neovim** - LSP, Treesitter, fuzzy finding, database tools ([details](docs/NEOVIM.md))
-- **Zsh** - Shell configuration
-- **Tmux** - Terminal multiplexer
-- **Ghostty** - Terminal emulator config
-- **Vencord Theme** - Custom Discord Theme 
-
-## Documentation
-
-- [Installation Guide](docs/INSTALLATION.md) - OS-specific prerequisites
-- [Neovim Setup](docs/NEOVIM.md) - Features, keybindings, plugins
-- [Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and fixes
-- [File Management Util](docs/FCONV.md) - Converter and compression script
-## Updating
-
-```bash
-cd ~/.dotfiles
-git pull
-stow --restow nvim zsh tmux ghostty
-```
-
-## Uninstalling
-
-```bash
-cd ~/.dotfiles
-stow -D nvim zsh tmux ghostty
-```
+| File | Content |
+| --- | --- |
+| [docs/packages.md](docs/packages.md) | tool to Homebrew name matrix, single source of truth |
+| [docs/install-macos.md](docs/install-macos.md) | fresh install on macOS |
+| [docs/neovim.md](docs/neovim.md) | Neovim plugins, languages, keymaps |
+| [docs/fconv.md](docs/fconv.md) | fconv converter usage |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | symptom, cause, fix |
+| [docs/known-issues.md](docs/known-issues.md) | bugs and hardcoded values in configs |

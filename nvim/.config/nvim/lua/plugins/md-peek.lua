@@ -1,4 +1,4 @@
-local use_local_dev = true
+local use_local_dev = false
 
 local spec = use_local_dev
     and { dir = vim.fn.expand("~/Github/md-peek.nvim"), name = "md-peek" }

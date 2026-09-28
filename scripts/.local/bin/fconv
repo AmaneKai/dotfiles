@@ -1,11 +1,7 @@
 #!/usr/bin/env bash
 
-################################################################################
-# FCONV - Professional Multi-format Converter (v1.2.5 - GIF & MacOS Patch)
-################################################################################
 set -euo pipefail
 
-# --- UI Colors ---
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -39,7 +35,6 @@ FILENAME=$(basename -- "$INPUT")
 NAME="${FILENAME%.*}"
 INPUT_EXT="${FILENAME##*.}"
 
-# Defaults
 AUDIO_BITRATE=128
 DISCORD_MODE=false
 TARGET_SIZE=10
@@ -49,7 +44,6 @@ RESOLUTION=""
 OUTPUT_FILE=""
 OUTPUT_FORMAT=""
 
-# --- Argument Parsing ---
 if [[ $# -gt 0 && ! "$1" =~ ^- ]]; then
     if [[ "$1" == *.* ]]; then
         OUTPUT_FILE="$1"; OUTPUT_FORMAT="${1##*.}"
@@ -76,17 +70,13 @@ OUTPUT_FORMAT="${OUTPUT_FORMAT:-$INPUT_EXT}"
 FMT_LOWER=$(echo "$OUTPUT_FORMAT" | tr '[:upper:]' '[:lower:]')
 [[ -z "$OUTPUT_FILE" ]] && OUTPUT_FILE="${NAME}.${FMT_LOWER}"
 
-# Safety: Avoid overwriting input
 IN_REAL=$(cd "$(dirname "$INPUT")" && pwd)/$(basename "$INPUT")
 OUT_DIR=$(dirname "$OUTPUT_FILE"); mkdir -p "$OUT_DIR"
 OUT_REAL=$(cd "$OUT_DIR" && pwd)/$(basename "$OUTPUT_FILE")
 [[ "$IN_REAL" == "$OUT_REAL" ]] && OUTPUT_FILE="${NAME}_converted.${FMT_LOWER}"
 
-# --- Engines ---
-
 handle_video() {
     local filters=""
-    # Handle Resolution & 16:9 Padding
     if [[ -n "$RESOLUTION" ]]; then
         local w="${RESOLUTION%x*}"; local h="${RESOLUTION#*x}"
         filters="scale=$w:$h:force_original_aspect_ratio=decrease,pad=$w:$h:(ow-iw)/2:(oh-ih)/2"
@@ -94,7 +84,6 @@ handle_video() {
         filters="scale='trunc(iw/2)*2':'trunc(ih/2)*2'"
     fi
 
-    # GIF Professional Engine (Palette Generation)
     if [[ "$FMT_LOWER" == "gif" ]]; then
         info "Generating High-Quality GIF with Palette..."
         ffmpeg -i "$INPUT" -y -hide_banner -loglevel error \
@@ -103,7 +92,6 @@ handle_video() {
         return
     fi
 
-    # Standard Video Logic
     local cmd=(ffmpeg -i "$INPUT" -y -hide_banner -loglevel warning -vf "$filters")
     if [[ -n "$VIDEO_BITRATE" ]]; then
         cmd+=(-c:v libx264 -b:v "${VIDEO_BITRATE}k")
@@ -131,7 +119,6 @@ handle_audio() {
 handle_image() {
     local cmd=(ffmpeg -i "$INPUT" -y -hide_banner -loglevel error)
     
-    # Explicitly specify the libwebp encoder for WebP files
     if [[ "$FMT_LOWER" == "webp" ]]; then
         cmd+=(-c:v libwebp)
     fi
@@ -149,11 +136,10 @@ handle_document() {
     [[ -f "$gen_file" && "$OUTPUT_FILE" != "$gen_file" ]] && mv "$gen_file" "$OUTPUT_FILE"
 }
 
-# --- Main Logic ---
 info "Converting: $INPUT ➜ $OUTPUT_FILE"
 
 case "$FMT_LOWER" in
-    mp4|mkv|mov|webm|gif)       handle_video ;; # GIF is now allowed!
+    mp4|mkv|mov|webm|gif)       handle_video ;;
     mp3|wav|ogg|m4a)            handle_audio ;;
     png|jpg|jpeg|webp)          handle_image ;;
     pdf|docx|doc|ppt|pptx|odt)  handle_document ;;

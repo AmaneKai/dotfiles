@@ -19,7 +19,6 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- Must be set before plugins load
 vim.g.mapleader      = " "
 vim.g.maplocalleader = "\\"
 

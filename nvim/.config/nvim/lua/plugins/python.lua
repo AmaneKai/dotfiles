@@ -1,5 +1,76 @@
+local CELL_MARKER = "^# %%%%"
+
+local function is_cell_marker(line)
+  return line:match(CELL_MARKER) ~= nil
+end
+
+local function buffer_lines()
+  return vim.api.nvim_buf_get_lines(0, 0, -1, false)
+end
+
+local function cell_body(lines, first, last)
+  local body = vim.list_slice(lines, first, last)
+  while #body > 0 and body[#body]:match("^%s*$") do
+    table.remove(body)
+  end
+  return body
+end
+
+local function send_to_repl(body)
+  if #body > 0 then
+    require("iron.core").send(nil, body)
+  end
+end
+
+local function send_cell_under_cursor()
+  local lines = buffer_lines()
+  local cursor_row = vim.api.nvim_win_get_cursor(0)[1]
+
+  local first = 1
+  for row = cursor_row, 1, -1 do
+    if is_cell_marker(lines[row]) then
+      first = row + 1
+      break
+    end
+  end
+
+  local last = #lines
+  for row = cursor_row + 1, #lines do
+    if is_cell_marker(lines[row]) then
+      last = row - 1
+      break
+    end
+  end
+
+  send_to_repl(cell_body(lines, first, last))
+end
+
+local function send_all_cells()
+  local lines = buffer_lines()
+  local markers = {}
+  for row, line in ipairs(lines) do
+    if is_cell_marker(line) then
+      table.insert(markers, row)
+    end
+  end
+  table.insert(markers, #lines + 1)
+
+  for index = 1, #markers - 1 do
+    send_to_repl(cell_body(lines, markers[index] + 1, markers[index + 1] - 1))
+  end
+end
+
+local function toggle_repl()
+  for _, window in ipairs(vim.api.nvim_list_wins()) do
+    if vim.bo[vim.api.nvim_win_get_buf(window)].filetype == "iron" then
+      vim.api.nvim_win_close(window, false)
+      return
+    end
+  end
+  require("iron.core").repl_here("python")
+end
+
 return {
-  -- ipython REPL managed inside a Neovim split (no tmux needed)
   {
     "Vigemus/iron.nvim",
     config = function()
@@ -22,82 +93,15 @@ return {
         ignore_blank_lines = true,
       })
 
-      -- send the current # %% cell
-      vim.keymap.set("n", "<leader>jc", function()
-        local core = require("iron.core")
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        local cursor = vim.api.nvim_win_get_cursor(0)[1]
-
-        local cell_start = 1
-        for i = cursor, 1, -1 do
-          if lines[i]:match("^# %%%%") then
-            cell_start = i + 1
-            break
-          end
-        end
-
-        local cell_end = #lines
-        for i = cursor + 1, #lines do
-          if lines[i]:match("^# %%%%") then
-            cell_end = i - 1
-            break
-          end
-        end
-
-        local chunk = vim.list_slice(lines, cell_start, cell_end)
-        while #chunk > 0 and chunk[#chunk]:match("^%s*$") do
-          table.remove(chunk)
-        end
-        core.send(nil, chunk)
-      end, { desc = "Send # %% cell to ipython" })
-
-      -- send all # %% cells top to bottom
-      vim.keymap.set("n", "<leader>ja", function()
-        local core = require("iron.core")
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-        local boundaries = {}
-        for i, line in ipairs(lines) do
-          if line:match("^# %%%%") then
-            table.insert(boundaries, i)
-          end
-        end
-        table.insert(boundaries, #lines + 1)
-
-        for i = 1, #boundaries - 1 do
-          local cell_start = boundaries[i] + 1
-          local cell_end = boundaries[i + 1] - 1
-          local chunk = vim.list_slice(lines, cell_start, cell_end)
-          while #chunk > 0 and chunk[#chunk]:match("^%s*$") do
-            table.remove(chunk)
-          end
-          if #chunk > 0 then
-            core.send(nil, chunk)
-          end
-        end
-      end, { desc = "Send all # %% cells to ipython" })
-
-      -- toggle the REPL split open/closed
-      vim.keymap.set("n", "<leader>jt", function()
-        local view = require("iron.view")
-        local core = require("iron.core")
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-          local buf = vim.api.nvim_win_get_buf(win)
-          if vim.bo[buf].filetype == "iron" then
-            vim.api.nvim_win_close(win, false)
-            return
-          end
-        end
-        core.repl_here("python")
-      end, { desc = "Toggle ipython REPL" })
-
+      vim.keymap.set("n", "<leader>jc", send_cell_under_cursor, { desc = "Send # %% cell to ipython" })
+      vim.keymap.set("n", "<leader>ja", send_all_cells, { desc = "Send all # %% cells to ipython" })
+      vim.keymap.set("n", "<leader>jt", toggle_repl, { desc = "Toggle ipython REPL" })
       vim.keymap.set("n", "<leader>jo", "<cmd>IronRepl<cr>", { desc = "Open ipython REPL" })
       vim.keymap.set("n", "<leader>jh", "<cmd>IronHide<cr>", { desc = "Hide ipython REPL" })
       vim.keymap.set("n", "<leader>jR", "<cmd>IronRestart<cr>", { desc = "Restart ipython REPL" })
     end,
   },
 
-  -- Transparent .ipynb <-> .py(percent) editing; gitignore .ipynb, commit .py
   {
     "goerz/jupytext.vim",
     init = function()
