@@ -15,24 +15,21 @@ return {
         vim.g.kotlin_notify_patched = true
       end
 
-      local kotlin_lsp_base = vim.fn.expand("$HOME/.local/share/nvim/mason/packages/kotlin-lsp")
+      local kotlin_lsp_base = vim.fn.stdpath("data") .. "/mason/packages/kotlin-lsp"
       local dirs = vim.fn.glob(kotlin_lsp_base .. "/kotlin-server-*", false, true)
       local versioned = dirs[1] or kotlin_lsp_base
       vim.env.KOTLIN_LSP_DIR = versioned
-      vim.env.JAVA_HOME = versioned .. (vim.fn.has("mac") == 1 and "/jbr/Contents/Home" or "/jbr")
+      local jbr = versioned .. (vim.fn.has("mac") == 1 and "/jbr/Contents/Home" or "/jbr")
 
       require("kotlin").setup({
         root_markers = { "gradlew", ".git", "settings.gradle", "build.gradle.kts" },
         lsp = {
-          cmd = { versioned .. "/bin/intellij-server", "--stdio" },
+          cmd = { "env", "JAVA_HOME=" .. jbr, versioned .. "/bin/intellij-server", "--stdio" },
           on_exit = function(code, signal, client_id) end,
         },
       })
 
-      vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-        pattern = "*.kt",
-        callback = function() vim.cmd("silent! w!") end,
-      })
+      require("callo.utils").autosave("KotlinAutoSave", "*.kt", { "InsertLeave", "TextChanged" })
 
       vim.api.nvim_create_autocmd("LspAttach", {
         pattern = "*.kt",

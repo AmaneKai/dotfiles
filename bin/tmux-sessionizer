@@ -1,16 +1,7 @@
 #!/usr/bin/env bash
 
-# ==============================================================================
-# tmux-sessionizer
-# ------------------------------------------------------------------------------
-# Quickly jump between project directories as tmux sessions.
-# Inspired by ThePrimeagen.
-# ==============================================================================
-
-# --- Configuration ---
 SEARCH_PATHS=(
-    "$HOME/Dotfiles"
-    "$HOME/i3-dotfiles/"
+    "${DOTFILES:-$HOME/Dotfiles}"
     "$HOME/Github"
     "$HOME/Codes"
     "$HOME/College"
@@ -19,38 +10,28 @@ SEARCH_PATHS=(
     "$HOME/Pictures/Screenshots/"
 )
 
-# --- Functions ---
-
-# Get the list of all valid directories (the base paths + their subdirectories)
 list_potential_sessions() {
     for dir in "${SEARCH_PATHS[@]}"; do
         if [[ -d "$dir" ]]; then
-            # Output the directory itself
             echo "$dir"
-            # Output immediate subdirectories (1 level deep)
             find "$dir" -mindepth 1 -maxdepth 1 -type d
         fi
     done
 }
 
-# Create a clean tmux session name from a file path
-# Replaces dots and colons with underscores to satisfy tmux naming rules
 get_session_name() {
     local path=$1
     basename "$path" | tr . _ | tr : _
 }
 
-# Core logic to either switch (if inside tmux) or attach (if outside)
 switch_to_session() {
     local name=$1
     local path=$2
 
-    # Create session if it doesn't exist (detached)
     if ! tmux has-session -t="$name" 2>/dev/null; then
         tmux new-session -ds "$name" -c "$path"
     fi
 
-    # Switch or Attach
     if [[ -z $TMUX ]]; then
         tmux attach-session -t "$name"
     else
@@ -58,29 +39,23 @@ switch_to_session() {
     fi
 }
 
-# --- Main Logic ---
-
 main() {
     local selected
 
-    # 1. Determine target directory
     if [[ $# -eq 1 ]]; then
         selected=$1
     else
         selected=$(list_potential_sessions | fzf)
     fi
 
-    # 2. Safety check: Exit if no selection made (e.g., pressed ESC in fzf)
     if [[ -z "$selected" ]]; then
         exit 0
     fi
 
-    # 3. Process session
     local session_name
     session_name=$(get_session_name "$selected")
 
     switch_to_session "$session_name" "$selected"
 }
 
-# Run the script
 main "$@"

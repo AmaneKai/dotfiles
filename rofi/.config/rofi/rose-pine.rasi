@@ -1,7 +1,3 @@
-/**
- * Rose Pine Rofi — Circle Language Edition
- */
-
 * {
     font:              "JetBrainsMono Nerd Font 11";
 
@@ -86,7 +82,6 @@ element-text {
     vertical-align:    0.5;
 }
 
-/* normal */
 element normal.normal {
     background-color:  transparent;
 }
@@ -94,7 +89,6 @@ element normal.normal element-text {
     text-color:        @subtle;
 }
 
-/* selected — teal orbit glow */
 element selected.normal {
     background-color:  rgba(156, 207, 216, 0.08);
     border:            1px solid;
@@ -104,7 +98,6 @@ element selected.normal element-text {
     text-color:        @text;
 }
 
-/* active — section headers (muted, no highlight) */
 element normal.active {
     background-color:  transparent;
 }
@@ -121,7 +114,6 @@ element selected.active element-text {
     font:              "JetBrainsMono Nerd Font 9";
 }
 
-/* urgent — rose */
 element normal.urgent element-text {
     text-color:        @love;
 }

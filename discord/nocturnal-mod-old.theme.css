@@ -8,16 +8,12 @@
  * @website https://betterdiscord.app/theme/Nocturnal
  */
 
-/*
- * very handy tool https://syndishanx.github.io/Website/Update_Classes.html
- */
-
 @import url("https://xcruxiex.github.io/themes/themes-cores/nocturnal.css");
 
 @import url("https://xcruxiex.github.io/themes/core/badges.css");
 @import url("https://xcruxiex.github.io/themes/core/custom-font.css");
-@import url("https://discordstyles.github.io/RadialStatus/dist/RadialStatus.css"); /* Radial Status */
-@import url("https://discordstyles.github.io/HorizontalServerList/dist/HorizontalServerList.css"); /* Horizontal Server List */
+@import url("https://discordstyles.github.io/RadialStatus/dist/RadialStatus.css");
+@import url("https://discordstyles.github.io/HorizontalServerList/dist/HorizontalServerList.css");
 
 * {
   font-family: JetBrains Mono;
@@ -36,11 +32,9 @@
   --textColor02: #908caa;
   --textColor03: #6e6a86;
 
-  /* Better Hljs */
   --backgroundCode: #191724;
   --backgroundName: rgba(0, 0, 0, 0.2);
 
-  /* Radial Status */
   --rs-small-spacing: 2px;
   --rs-large-spacing: 3px;
   --rs-width: 2px;
@@ -63,8 +57,6 @@
   --HSL-server-direction: column;
 }
 
-/* fix */
-/* more consistent colors */
 :root,
 .theme-dark {
   --background-primary: var(--backgroundColor02);
@@ -97,12 +89,10 @@
   color: var(--backgroundColor01);
 }
 
-/* titlebar removal */
 div[class*="titleBar-"] {
   display: none !important;
 }
 
-/* dividers instead of folder icons + expanded folders background removal */
 .expandedFolderIconWrapper_bc7085 {
   transform: scale(0.1, 2);
 }
@@ -110,7 +100,6 @@ div[class*="titleBar-"] {
   background: transparent !important;
 }
 
-/* server icon badges adjustment */
 .lowerBadge_c5f96a {
   transform: translate(5px, 2px) !important;
 }
@@ -133,7 +122,6 @@ div[class*="titleBar-"] {
   height: calc(var(--HSL-server-icon-size) / 3) !important;
 }
 
-/* custom active server pill */
 #app-mount .guilds_a4d4d9 [class*="pill"] {
   top: calc(var(--server-size) / -2 + var(--server-size) + 8px) !important;
 }
@@ -144,7 +132,6 @@ div[class*="titleBar-"] {
   width: 2px !important;
 }
 
-/* top bar removal + hoverable channel description and search bar */
 #app-mount .container_fc4f04.themed_fc4f04 {
   background: unset !important;
   background-image: linear-gradient(
@@ -180,7 +167,6 @@ div[class*="titleBar-"] {
   background: transparent;
 }
 
-/* custom unread bar + clickable elements adjustment */
 #app-mount .newMessagesBar_cf58b5,
 .barButtonBase_cf58b5 {
   background-color: var(--backgroundColor03);
@@ -194,7 +180,6 @@ div[class*="titleBar-"] {
   margin-top: 40px;
 }
 
-/* cleaner floating boxes, cards */
 #app-mount .emptyCard_f02fcf .inset_c0f6a6,
 #app-mount .emptyCard_f02fcf .section_cd82a7,
 #app-mount .wrapper_cd82a7 .inset_c0f6a6,
@@ -202,7 +187,6 @@ div[class*="titleBar-"] {
   box-shadow: none;
 }
 
-/* consistent avatar corner rounding */
 .avatar_f9f2ca,
 .avatar_cdc675 {
   border-radius: var(--rs-avatar-shape);
@@ -215,13 +199,11 @@ div[class*="titleBar-"] {
   transform: scale(0.9);
 }
 
-/* better readability of user mentions */
 #app-mount .wrapper_d4fa29 {
   color: var(--backgroundColor02);
   text-shadow: none;
 }
 
-/* custom unread divider */
 .isUnread_c2654d .content_c2654d {
   border: 1px solid var(--divider-color);
 }
@@ -229,7 +211,6 @@ div[class*="titleBar-"] {
   color: var(--backgroundColor02);
 }
 
-/* message input field with borders + lesser buttons + consistent emoji picker colors */
 .channelTextArea_a7d72e.channelTextArea_d0696b {
   border: 3px solid var(--backgroundColor04) !important;
 }

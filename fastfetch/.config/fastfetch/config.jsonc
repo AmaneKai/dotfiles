@@ -7,11 +7,11 @@
             "left": 3
         },
         "color": {
-            "1": "white",    // Hair Top
-            "2": "cyan",     // Eye area / Glow
-            "3": "magenta",  // Eyes / Details
-            "4": "white",    // Face
-            "5": "blue"      // Bottom / Clothes
+            "1": "white",
+            "2": "cyan",
+            "3": "magenta",
+            "4": "white",
+            "5": "blue"
         }
     },
     "display": {

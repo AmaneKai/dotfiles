@@ -43,7 +43,7 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | Rust | rust_analyzer (clippy) | none |
 | Java | jdtls (Mason package) | jdtls, on save |
 | Kotlin | kotlin-lsp (Mason package) | none |
-| Go | gopls if installed by hand | none |
+| Go | gopls, enabled when `gopls` is on PATH | none |
 
 Mason installs: lua_ls, tailwindcss, html, vtsls, rust_analyzer, svelte, eslint, pyright. Install jdtls and kotlin-lsp with `:MasonInstall jdtls kotlin-lsp`.
 
@@ -134,7 +134,7 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | `<leader>jt`, `<leader>jo`, `<leader>jh` | iron toggle, open, hide REPL | global |
 | `<leader>jR`, `<leader>jq`, `<leader>jl` | iron restart, exit, clear | global |
 | `<leader>j<space>` | iron interrupt | global |
-| `<leader>jo`, `<leader>jc`, `<leader>jr`, `<leader>jR`, `<leader>jK` | ipynb-peek open, close, run cell, run all, restart kernel | `.ipynb` (overlaps iron, see `docs/known-issues.md`) |
+| `<leader>io`, `<leader>ic`, `<leader>ir`, `<leader>iR`, `<leader>iK` | ipynb-peek open, close, run cell, run all, restart kernel | `.ipynb` |
 | `<leader>ss`, `<leader>sa`, `<leader>sc` | spell toggle, add word, suggest | typst, markdown, text, tex |
 | `<C-y>` | emmet leader | HTML, CSS, JS, JSX, TSX |
 | `<C-Space>` | completion menu, docs | insert |
@@ -158,7 +158,7 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | --- | --- |
 | `*.html`, `*.css`, `*.js` | text change, insert leave |
 | `*.typ` | text change, insert leave |
-| `*.kt` | text change, insert leave |
+| `*.kt` | normal-mode text change, insert leave |
 
 ## Commands
 

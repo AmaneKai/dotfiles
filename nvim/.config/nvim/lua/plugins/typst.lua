@@ -32,11 +32,7 @@ return {
         end,
       })
 
-      vim.api.nvim_create_autocmd({ "TextChanged", "TextChangedI", "InsertLeave" }, {
-        group    = vim.api.nvim_create_augroup("TypstAutoSave", { clear = true }),
-        pattern  = "*.typ",
-        callback = function() vim.cmd("silent! write") end,
-      })
+      require("callo.utils").autosave("TypstAutoSave", "*.typ")
     end,
   },
 }

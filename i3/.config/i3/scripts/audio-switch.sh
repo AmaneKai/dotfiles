@@ -1,126 +1,74 @@
 #!/usr/bin/env bash
-#
-# audio-switch.sh - Audio device switcher for i3wm
-# Switches between Fifine microphone and AirPods with Japanese notifications
-#
-# Usage: audio-switch.sh {fifine|airpods|toggle}
 
 set -euo pipefail
 
-# Device identifiers
-readonly FIFINE="alsa_output.usb-FIFINE_Microphones_FIFINE_K690_Microphone\
-_REV1.1-00.analog-stereo"
-readonly AIRPODS_CARD="bluez_card.14_7A_E4_DD_CA_26"
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+
 readonly AIRPODS_PROFILE="a2dp-sink"
-readonly SOUNDS="${HOME}/.config/i3/sounds"
+readonly SOUNDS="$HOME/.config/i3/sounds"
 
-# Check if AirPods device exists in PipeWire
-device_exists() {
-    pactl list sinks short | grep -q "bluez_output.14"
+first_matching_name() {
+    local list=$1 pattern=$2
+    pactl list "$list" short | awk -v pattern="$pattern" '$2 ~ pattern {print $2; exit}'
 }
 
-# Get the current AirPods sink name
-get_airpods_sink() {
-    pactl list sinks short \
-        | grep "bluez_output.14" \
-        | awk '{print $2}' \
-        | head -1
-}
+fifine_sink()   { first_matching_name sinks "FIFINE"; }
+airpods_card()  { first_matching_name cards "^bluez_card[.]"; }
+airpods_sink()  { first_matching_name sinks "^bluez_output[.]"; }
 
-# Switch audio output to specified device and move all streams
-switch_audio() {
-    local device="$1"
-    
-    # Set default sink
-    pactl set-default-sink "$device"
-    
-    # Move all playing streams to new device
-    while IFS= read -r stream; do
-        pactl move-sink-input "$stream" "$device" 2>/dev/null || true
-    done < <(pactl list sink-inputs short | awk '{print $1}')
-}
-
-# Play notification sound
 play_sound() {
-    local sound_file="$1"
-    mpv --no-video "${SOUNDS}/${sound_file}" &>/dev/null &
+    mpv --no-video "$SOUNDS/$1" &>/dev/null &
 }
 
-# Send desktop notification
-send_notification() {
-    local message="$1"
-    notify-send "オーディオ" "$message"
+notify() {
+    notify-send "オーディオ" "$1"
 }
 
-# Activate AirPods with A2DP profile
+report_missing() {
+    notify "$1"
+    play_sound "airpods-error.mp3"
+    return 1
+}
+
+switch_to_sink() {
+    local sink=$1 message=$2 sound=$3
+    set_default_audio_device sink "$sink"
+    notify "$message"
+    play_sound "$sound"
+}
+
 activate_airpods() {
-    # Force A2DP profile for high-quality audio
-    pactl set-card-profile "$AIRPODS_CARD" "$AIRPODS_PROFILE" \
-        2>/dev/null || {
-        send_notification "AirPodsプロファイル設定エラー"
-        return 1
-    }
-    
+    local card sink
+    card=$(airpods_card)
+    [[ -n "$card" ]] || report_missing "イヤホンが接続されていません (╥﹏╥)" || return
+
+    pactl set-card-profile "$card" "$AIRPODS_PROFILE" 2>/dev/null \
+        || { notify "AirPodsプロファイル設定エラー"; return 1; }
     sleep 0.5
-    
-    local airpods_sink
-    airpods_sink=$(get_airpods_sink)
-    
-    if [[ -z "$airpods_sink" ]]; then
-        send_notification "イヤホンが接続されていません (╥﹏╥)"
-        play_sound "airpods-error.mp3"
-        return 1
+
+    sink=$(airpods_sink)
+    [[ -n "$sink" ]] || report_missing "イヤホンが接続されていません (╥﹏╥)" || return
+    switch_to_sink "$sink" "イヤホンに接続しました ♪(´▽｀)" "airpods-connected.mp3"
+}
+
+activate_fifine() {
+    local sink
+    sink=$(fifine_sink)
+    [[ -n "$sink" ]] || report_missing "マイクが接続されていません (╥﹏╥)" || return
+    switch_to_sink "$sink" "マイクに接続しました (✿◠‿◠)" "mic-connected.mp3"
+}
+
+toggle() {
+    if [[ "$(pactl get-default-sink)" == *FIFINE* ]]; then
+        activate_airpods
+    else
+        activate_fifine
     fi
-    
-    switch_audio "$airpods_sink"
-    send_notification "イヤホンに接続しました ♪(´▽｀)"
-    play_sound "airpods-connected.mp3"
 }
 
-# Main command handler
-main() {
-    local command="${1:-}"
-    
-    case "$command" in
-        fifine)
-            switch_audio "$FIFINE"
-            send_notification "マイクに接続しました (✿◠‿◠)"
-            play_sound "mic-connected.mp3"
-            ;;
-        
-        airpods)
-            if device_exists; then
-                activate_airpods
-            else
-                send_notification "イヤホンが接続されていません (╥﹏╥)"
-                play_sound "airpods-error.mp3"
-            fi
-            ;;
-        
-        toggle)
-            local current
-            current=$(pactl get-default-sink)
-            
-            if [[ "$current" == *"FIFINE"* ]]; then
-                if device_exists; then
-                    activate_airpods
-                else
-                    send_notification \
-                        "イヤホンが接続されていません (╥﹏╥)"
-                    play_sound "airpods-error.mp3"
-                fi
-            else
-                switch_audio "$FIFINE"
-                send_notification "マイクに接続しました (✿◠‿◠)"
-                play_sound "mic-connected.mp3"
-            fi
-            ;;
-        
-        *)
-            echo "Usage: $0 {fifine|airpods|toggle}" >&2
-            exit 1
-            ;;
-    esac
-}
-
-main "$@"
+case "${1:-}" in
+    fifine)  activate_fifine ;;
+    airpods) activate_airpods ;;
+    toggle)  toggle ;;
+    *)       echo "Usage: $0 {fifine|airpods|toggle}" >&2; exit 1 ;;
+esac

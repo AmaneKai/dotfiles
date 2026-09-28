@@ -9,7 +9,6 @@ return {
     telescope.setup({
       defaults = {
         path_display = { "smart" },
-        -- Disable treesitter in previewer for performance on large files
         preview  = { treesitter = false },
         mappings = {
           i = {

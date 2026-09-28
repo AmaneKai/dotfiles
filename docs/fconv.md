@@ -46,7 +46,9 @@ fconv <input> [format | output-file] [options]
 | --- | --- | --- |
 | mp4, mkv, mov, webm | ffmpeg | libx264 CRF 23 preset fast, AAC audio, yuv420p |
 | gif | ffmpeg | palettegen + paletteuse |
-| mp3, ogg, m4a | ffmpeg | libmp3lame |
+| mp3 | ffmpeg | libmp3lame |
+| ogg | ffmpeg | libvorbis |
+| m4a | ffmpeg | aac |
 | wav | ffmpeg | pcm_s16le |
 | png, jpg, jpeg, webp | ffmpeg | default, libwebp for webp |
 | pdf, docx, doc, ppt, pptx, odt | LibreOffice headless | n/a |
@@ -58,6 +60,5 @@ fconv <input> [format | output-file] [options]
 | Output path equals input path | writes `<name>_converted.<format>` |
 | Discord bitrate below 150 kbps | clamped to 150 kbps |
 | Output format not in the table | exits with `Unsupported format` |
+| Unknown option | exits with `Unknown option` |
 | Output file missing after run | exits with `Conversion failed.` |
-
-Script bugs are listed in `docs/known-issues.md`.

@@ -3,8 +3,6 @@ return {
     "spell-config",
     dir = vim.fn.stdpath("config"),
     config = function()
-      -- Enable native spell checking for prose filetypes.
-      -- The spell completion source is registered in blink.lua via per_filetype.
       vim.api.nvim_create_autocmd("FileType", {
         pattern  = { "typst", "markdown", "text", "tex" },
         callback = function()

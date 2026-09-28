@@ -108,16 +108,15 @@ On the audited Arch install the adapter is absent: no `/sys/class/bluetooth`, no
 | If nothing shows | Check the BIOS wireless / Bluetooth toggle |
 | After it shows | `sudo systemctl enable --now bluetooth` |
 
-`i3/.config/i3/scripts/audio-switch.sh:13` hardcodes an AirPods card MAC. `bluetooth-menu.sh` does not hardcode a MAC.
+`audio-switch.sh airpods` uses the first Bluetooth audio card it finds. No MAC address is hardcoded.
 
 ## Polybar
 
 | Item | Value |
 | --- | --- |
 | Battery | `battery = BAT1`, `adapter = AC` (`polybar/.config/polybar/config.ini:192-193`) |
-| Output | `eDP-1`. `launch.sh` expects `eDP` and starts the wrong bar. See `docs/known-issues.md` |
-| Spinner | `format = <output>` is invalid. Remove `spinner` from `modules-right` to disable |
-| Tray | `tray-*` keys are deprecated since polybar 3.7 |
+| Output | `eDP-1`. `launch.sh` picks the first active `eDP*` output for the `laptop` bar |
+| Tray | `internal/tray` module at the right end |
 
 ## Video decode
 
@@ -150,7 +149,7 @@ Configs call `wpctl` (i3 volume keys) and `pactl` (menus, polybar).
 
 ## Japanese input
 
-Not configured by the repo. Needs fcitx5, the Mozc engine, and these variables before i3 starts (the audited `~/.xinitrc` sets the first three; `SDL_IM_MODULE` is missing there):
+`xinit/.xinitrc` sets these variables before i3 starts. Install fcitx5 and the Mozc engine (see `docs/packages.md`):
 
 ```sh
 export GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx XMODIFIERS=@im=fcitx SDL_IM_MODULE=fcitx

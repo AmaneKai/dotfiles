@@ -1,19 +1,20 @@
 set -g fish_greeting
 
-# Environment
 set -gx EDITOR nvim
 set -gx VISUAL nvim
 set -gx QT_QPA_PLATFORMTHEME qt5ct
 set -gx MESA_GL_VERSION_OVERRIDE 4.5
 set -gx MESA_GLSL_VERSION_OVERRIDE 450
 set -gx vblank_mode 0
-set -gx JAVA_HOME /usr/lib/jvm/java-26-openjdk
 set -gx BUN_INSTALL $HOME/.bun
 
-# PATH (dirs that don't exist yet are skipped)
+set -l dotfiles (path resolve (status filename) | path dirname | path dirname | path dirname | path dirname)
+test -d $dotfiles/bin; or set dotfiles $HOME/Dotfiles
+set -gx DOTFILES $dotfiles
+
 fish_add_path -g \
     $HOME/.cargo/bin \
-    $HOME/Dotfiles/bin \
+    $DOTFILES/bin \
     $HOME/.local/bin \
     $HOME/.local/share/nvim/mason/bin \
     $HOME/.npm-global/bin \
@@ -26,7 +27,10 @@ if type -q go
     fish_add_path -g -a (go env GOPATH)/bin
 end
 
-# Aliases
+if type -q java
+    set -gx JAVA_HOME (path resolve (command -v java) | path dirname | path dirname)
+end
+
 alias vi nvim
 alias ls "eza --icons=auto"
 alias ll "eza -lg --icons=auto"
@@ -40,7 +44,6 @@ alias preflight "bunx prisma generate && bun run check && bun run test && bun ru
 alias g git
 complete -c g -w git
 
-# Functions
 function ginit
     if test (count $argv) -eq 0
         echo "Usage: ginit <project-name>"
@@ -49,7 +52,6 @@ function ginit
     gradle init --type java-application --package $argv[1]
 end
 
-# Interactive only
 if status is-interactive
     if type -q zoxide
         zoxide init fish | source

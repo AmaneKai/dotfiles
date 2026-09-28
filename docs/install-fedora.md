@@ -145,8 +145,6 @@ mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
 npm install -g prettier eslint_d
 ```
 
-Accept the deno installer's offer to edit shell config. `zsh/.zshrc:98` needs `~/.deno/env` (UNVERIFIED that the installer creates it otherwise).
-
 gradle: not in Fedora. Download from https://services.gradle.org/distributions/ or use SDKMAN (UNVERIFIED).
 
 `hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
@@ -168,7 +166,7 @@ chsh -s /usr/bin/zsh
 
 ## 7. Clone
 
-The repo must be at `~/Dotfiles` (hardcoded in zsh, fish, tmux).
+`~/Dotfiles` is the default location. zsh, fish and tmux resolve the real path from the stowed symlinks.
 
 ```bash
 git clone https://github.com/AmaneKai/dotfiles.git ~/Dotfiles
@@ -178,18 +176,19 @@ git checkout linux
 
 ## 8. Stow
 
-Create the parent directories first so stow links files, not whole directories.
+Create the parent directories first so stow links files, not whole directories. Otherwise installers that write to `~/.local/bin` or `~/bin` write into the repo. Move existing shell and X start files out of the way.
 
 ```bash
-mkdir -p ~/.config ~/.local/bin
+mkdir -p ~/.config ~/.local/bin ~/bin
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
+mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow --ignore=g14-power --ignore=claude autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xresources zsh
+stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files
 
-Copies `system/etc/` into `/etc` (synaptics config). The acpi part does nothing until `system/etc/acpi/` exists (see `docs/known-issues.md`).
+Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files. Prints `no etc/acpi in repo; skipped acpid setup` until `system/etc/acpi/` exists (see `docs/known-issues.md`).
 
 ```bash
 ~/Dotfiles/system/install.sh
@@ -197,16 +196,7 @@ Copies `system/etc/` into `/etc` (synaptics config). The acpi part does nothing 
 
 ## 10. Session start file
 
-Not in repo. Use it with `startx`. With a display manager (SDDM), pick the i3 session instead and set the four IM variables another way (UNVERIFIED which file SDDM reads for X11 sessions).
-
-```bash
-cat > ~/.xinitrc <<'EOF'
-#!/bin/sh
-[ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
-export GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx XMODIFIERS=@im=fcitx SDL_IM_MODULE=fcitx
-exec i3
-EOF
-```
+`~/.xinitrc` comes from the `xinit` stow package. It loads `~/.Xresources`, sets the fcitx input method variables, and starts i3 for `startx`. With a display manager (SDDM), pick the i3 session instead; `~/.xinitrc` is then not read and the input method variables must be set another way (UNVERIFIED which file the display manager reads).
 
 ## 11. Machine-specific
 
@@ -228,7 +218,7 @@ balooctl6 disable
 sudo reboot
 ```
 
-Log into the i3 session, or on a tty run `startx`. Then save the autorandr profile used by i3:
+Log into the i3 session, or on a tty run `startx`. On the CF-SV7 the `laptop` autorandr profile is already in the repo. On another machine, save your own (this overwrites the repo copy):
 
 ```bash
 autorandr --save laptop
@@ -239,6 +229,8 @@ autorandr --save laptop
 | Command | Expected |
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
+| `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
+| `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |
 | `echo $SHELL` | `/usr/bin/zsh` |
 | `i3lock --help 2>&1 \| grep -c -- --clock` | a number above 0 (i3lock-color). Output format UNVERIFIED |
@@ -255,4 +247,4 @@ autorandr --save laptop
 | `node --version` | `v24.x` |
 | `nvim --version \| head -1` | `NVIM v0.12.x` or newer |
 | `tree-sitter --version` | `tree-sitter 0.26.x` or newer |
-| `ls /usr/lib/jvm` | a `java-NN-openjdk` directory. Compare with `JAVA_HOME` in `zsh/.zshrc:94` (hardcoded `java-26-openjdk`) |
+| `echo $JAVA_HOME` | the installed JDK directory under `/usr/lib/jvm` |

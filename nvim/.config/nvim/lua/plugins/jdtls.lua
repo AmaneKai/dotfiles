@@ -44,7 +44,7 @@ return {
           signatureHelp    = { enabled = true },
           contentProvider  = { preferred = "fernflower" },
           format           = { enabled = true },
-          autobuild        = { enabled = false }, -- prevents freezing during refactors
+          autobuild        = { enabled = false },
         },
       },
       on_attach = function(_, bufnr)

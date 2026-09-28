@@ -18,24 +18,24 @@ i3 (X11) desktop, shell, and editor configs for Arch, Fedora, and the Debian fam
 | nvim | Neovim | `~/.config/nvim/` |
 | polybar | status bar | `~/.config/polybar/` |
 | rofi | launcher theme | `~/.config/rofi/` |
-| scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore, uv | `~/.local/bin/` |
+| scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore | `~/.local/bin/` |
 | tmux | tmux | `~/.tmux.conf` |
 | wezterm | wezterm terminal (i3 default) | `~/.config/wezterm/wezterm.lua` |
+| xinit | `startx` session: Xresources, input method variables, i3 | `~/.xinitrc` |
 | xresources | Xft DPI | `~/.Xresources` |
 | zsh | zsh with oh-my-zsh (login shell) | `~/.zshrc` |
 
-Not stowed: `bin/` (used in place from `~/Dotfiles/bin`), `system/` (copied to `/etc` by `system/install.sh`), `discord/` (copy by hand).
+Not stowed: `bin/` (added to PATH by zsh and fish), `system/` (copied to `/etc` by `system/install.sh`), `extras/` (tools for other machines), `discord/` (copy by hand).
 
 ## Quick start
 
 1. Install packages for your distro: [Arch](docs/install-arch.md), [Fedora](docs/install-fedora.md), [Debian family](docs/install-debian.md).
-2. Clone to `~/Dotfiles` and check out `linux`.
-3. Run `mkdir -p ~/.config ~/.local/bin`.
-4. From `~/Dotfiles`, run `stow --ignore=g14-power --ignore=claude <packages>`.
+2. Clone and check out `linux`. `~/Dotfiles` is the default location; zsh, fish and tmux resolve the real path from the symlinks.
+3. Run `mkdir -p ~/.config ~/.local/bin ~/bin`.
+4. From `~/Dotfiles`, run `stow <packages>`.
 5. Run `~/Dotfiles/system/install.sh`.
-6. Create `~/.xinitrc` as shown in the install guide.
-7. Reboot, run `startx`, then `autorandr --save laptop`.
-8. Run the verify table at the end of the install guide.
+6. Reboot and run `startx`.
+7. Run the verify table at the end of the install guide.
 
 ## Docs
 

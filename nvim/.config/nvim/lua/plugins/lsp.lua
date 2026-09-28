@@ -1,3 +1,22 @@
+local ts_js = {
+  updateImportsOnFileMove = { enabled = "always" },
+  suggest = {
+    completeFunctionCalls = false,
+  },
+  preferences = {
+    importModuleSpecifierPreference = "non-relative",
+    includeCompletionsForModuleExports = true,
+  },
+  inlayHints = {
+    parameterNames = { enabled = "none" },
+    parameterTypes = { enabled = false },
+    variableTypes = { enabled = false },
+    propertyDeclarationTypes = { enabled = false },
+    functionLikeReturnTypes = { enabled = false },
+    enumMemberValues = { enabled = false },
+  },
+}
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -7,159 +26,104 @@ return {
       "saghen/blink.cmp",
     },
     config = function()
-      require("mason").setup()
-      local lspconfig = require("lspconfig")
       local has_blink, blink = pcall(require, "blink.cmp")
       local capabilities = has_blink and blink.get_lsp_capabilities() or vim.lsp.protocol.make_client_capabilities()
 
+      vim.lsp.config("*", { capabilities = capabilities })
+
+      vim.lsp.config("lua_ls", {
+        settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+      })
+
+      vim.lsp.config("vtsls", {
+        settings = {
+          typescript = ts_js,
+          javascript = ts_js,
+          vtsls = {
+            autoUseWorkspaceTsdk = true,
+            experimental = {
+              completion = {
+                enableServerSideFuzzyMatch = true,
+              },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config("tailwindcss", {
+        settings = {
+          tailwindCSS = {
+            includeLanguages = { rust = "html" },
+            experimental = { classRegex = { 'class="([^"]*)"', 'class=([^,)]*)' } },
+          },
+        },
+      })
+
+      vim.lsp.config("html", {
+        init_options = {
+          provideFormatter = true,
+          embeddedLanguages = { css = true, javascript = true },
+          configurationSection = { "html", "css", "javascript" },
+        },
+        settings = { html = { format = { templated = true }, suggest = { html5 = true } } },
+      })
+
+      vim.lsp.config("svelte", {
+        on_attach = function(client, _)
+          vim.api.nvim_create_autocmd("BufWritePost", {
+            pattern = { "*.ts", "*.js" },
+            callback = function(ctx)
+              client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+            end,
+          })
+        end,
+        settings = {
+          typescript = {
+            inlayHints = {
+              parameterNames = { enabled = "literals" },
+              parameterTypes = { enabled = true },
+              variableTypes = { enabled = true },
+              propertyDeclarationTypes = { enabled = true },
+              functionLikeReturnTypes = { enabled = true },
+              enumMemberValues = { enabled = true },
+            },
+          },
+        },
+      })
+
+      vim.lsp.config("gopls", {
+        settings = {
+          gopls = {
+            completeUnimported = true,
+            usePlaceholders = true,
+            analyses = { unusedparams = true },
+          },
+        },
+      })
+
+      vim.lsp.config("rust_analyzer", {
+        settings = {
+          ["rust-analyzer"] = {
+            check = { command = "clippy" },
+            checkOnSave = true,
+            procMacro = { enable = true },
+            cargo = { features = "all" },
+          },
+        },
+      })
+
+      require("mason").setup()
       require("mason-lspconfig").setup({
         ensure_installed = {
           "lua_ls", "tailwindcss", "html",
           "vtsls", "rust_analyzer", "svelte", "eslint",
           "pyright",
         },
-        handlers = {
-          function(server_name)
-            lspconfig[server_name].setup({ capabilities = capabilities })
-          end,
-
-          ["lua_ls"] = function()
-            lspconfig.lua_ls.setup({
-              capabilities = capabilities,
-              settings = { Lua = { diagnostics = { globals = { "vim" } } } },
-            })
-          end,
-
-          ["vtsls"] = function()
-            lspconfig.vtsls.setup({
-              capabilities = capabilities,
-              settings = {
-                typescript = {
-                  updateImportsOnFileMove = { enabled = "always" },
-                  suggest = {
-                    completeFunctionCalls = false,
-                  },
-                  preferences = {
-                    importModuleSpecifierPreference = "non-relative",
-                    includeCompletionsForModuleExports = true,
-                  },
-                  inlayHints = {
-                    parameterNames = { enabled = "none" },
-                    parameterTypes = { enabled = false },
-                    variableTypes = { enabled = false },
-                    propertyDeclarationTypes = { enabled = false },
-                    functionLikeReturnTypes = { enabled = false },
-                    enumMemberValues = { enabled = false },
-                  },
-                },
-                javascript = {
-                  updateImportsOnFileMove = { enabled = "always" },
-                  suggest = {
-                    completeFunctionCalls = false,
-                  },
-                  preferences = {
-                    importModuleSpecifierPreference = "non-relative",
-                    includeCompletionsForModuleExports = true,
-                  },
-                  inlayHints = {
-                    parameterNames = { enabled = "none" },
-                    parameterTypes = { enabled = false },
-                    variableTypes = { enabled = false },
-                    propertyDeclarationTypes = { enabled = false },
-                    functionLikeReturnTypes = { enabled = false },
-                    enumMemberValues = { enabled = false },
-                  },
-                },
-                vtsls = {
-                  autoUseWorkspaceTsdk = true,
-                  experimental = {
-                    completion = {
-                      enableServerSideFuzzyMatch = true,
-                    },
-                  },
-                },
-              },
-            })
-          end,
-
-          ["tailwindcss"] = function()
-            lspconfig.tailwindcss.setup({
-              capabilities = capabilities,
-              settings = {
-                tailwindCSS = {
-                  includeLanguages = { rust = "html" },
-                  experimental = { classRegex = { 'class="([^"]*)"', 'class=([^,)]*)' } },
-                },
-              },
-            })
-          end,
-
-          ["html"] = function()
-            lspconfig.html.setup({
-              capabilities = capabilities,
-              init_options = {
-                provideFormatter = true,
-                embeddedLanguages = { css = true, javascript = true },
-                configurationSection = { "html", "css", "javascript" },
-              },
-              settings = { html = { format = { templated = true }, suggest = { html5 = true } } },
-            })
-          end,
-
-          ["svelte"] = function()
-            lspconfig.svelte.setup({
-              capabilities = capabilities,
-              on_attach = function(client, _)
-                vim.api.nvim_create_autocmd("BufWritePost", {
-                  pattern = { "*.ts", "*.js" },
-                  callback = function(ctx)
-                    client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-                  end,
-                })
-              end,
-              settings = {
-                typescript = {
-                  inlayHints = {
-                    parameterNames = { enabled = "literals" },
-                    parameterTypes = { enabled = true },
-                    variableTypes = { enabled = true },
-                    propertyDeclarationTypes = { enabled = true },
-                    functionLikeReturnTypes = { enabled = true },
-                    enumMemberValues = { enabled = true },
-                  },
-                },
-              },
-            })
-          end,
-
-          ["gopls"] = function()
-            lspconfig.gopls.setup({
-              capabilities = capabilities,
-              settings = {
-                gopls = {
-                  completeUnimported = true,
-                  usePlaceholders = true,
-                  analyses = { unusedparams = true },
-                },
-              },
-            })
-          end,
-
-          ["rust_analyzer"] = function()
-            lspconfig.rust_analyzer.setup({
-              capabilities = capabilities,
-              settings = {
-                ["rust-analyzer"] = {
-                  check = { command = "clippy" },
-                  checkOnSave = true,
-                  procMacro = { enable = true },
-                  cargo = { features = "all" },
-                },
-              },
-            })
-          end,
-        },
       })
+
+      if vim.fn.executable("gopls") == 1 then
+        vim.lsp.enable("gopls")
+      end
 
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),

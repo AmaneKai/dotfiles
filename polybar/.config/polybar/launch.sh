@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 readonly POLYBAR_CONFIG="$HOME/.config/polybar/config.ini"
-readonly LAPTOP_OUTPUT="eDP"
 
 kill_existing_polybar() {
   killall -q polybar
@@ -10,12 +9,17 @@ kill_existing_polybar() {
   done
 }
 
-find_active_external_output() {
+list_active_outputs() {
   xrandr --query \
-    | grep " connected [0-9]" \
-    | awk '{print $1}' \
-    | grep -v "^${LAPTOP_OUTPUT}$" \
-    | head -1
+    | awk '$2 == "connected" && $0 ~ / [0-9]+x[0-9]+\+[0-9]+\+[0-9]+/ {print $1}'
+}
+
+find_laptop_output() {
+  list_active_outputs | grep -m1 '^eDP' || echo "eDP-1"
+}
+
+find_active_external_output() {
+  list_active_outputs | grep -v '^eDP' | head -1
 }
 
 launch_polybar() {
@@ -27,7 +31,7 @@ launch_polybar() {
     return
   fi
 
-  MONITOR="$LAPTOP_OUTPUT" polybar --config="$POLYBAR_CONFIG" laptop &
+  MONITOR="$(find_laptop_output)" polybar --config="$POLYBAR_CONFIG" laptop &
 }
 
 kill_existing_polybar

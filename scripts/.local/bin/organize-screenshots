@@ -1,16 +1,14 @@
 #!/bin/bash
 
-SCREENSHOTS_DIR="$HOME/Pictures/"
+readonly PICTURES_DIR="$HOME/Pictures"
 
-mkdir -p "$SCREENSHOTS_DIR/Screenshots"
-mkdir -p "$SCREENSHOTS_DIR/Recordings"
-mkdir -p "$SCREENSHOTS_DIR/other"
+move_top_level_files() {
+    local destination=$1
+    shift
+    mkdir -p "$PICTURES_DIR/$destination"
+    find "$PICTURES_DIR" -maxdepth 1 -type f "$@" -exec mv {} "$PICTURES_DIR/$destination/" \;
+}
 
-find "$SCREENSHOTS_DIR" -maxdepth 1 -name 'Screenshot*.png' -exec mv {} "$SCREENSHOTS_DIR/screenshots/" \;
-
-find "$SCREENSHOTS_DIR" -maxdepth 1 -name 'Screen Recording*.mov' -exec mv {} "$SCREENSHOTS_DIR/recordings/" \;
-
-find "$SCREENSHOTS_DIR" -maxdepth 1 -type f \
-    ! -name 'Screenshot*.png' \
-    ! -name 'Screen Recording*.mov' \
-    -exec mv {} "$SCREENSHOTS_DIR/other/" \;
+move_top_level_files Screenshots \( -name 'Screenshot*.png' -o -name 'screenshot-*.png' \)
+move_top_level_files Recordings -name 'Screen Recording*.mov'
+move_top_level_files other

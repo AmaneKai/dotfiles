@@ -71,7 +71,7 @@ sudo pacman -S --needed power-profiles-daemon thermald acpid intel-media-driver 
 zsh:
 
 ```bash
-sudo pacman -S --needed zsh zoxide eza fzf yt-dlp gradle go bun jdk-openjdk opencode nodejs npm rustup xdg-user-dirs
+sudo pacman -S --needed zsh zoxide eza fzf yt-dlp gradle go bun deno jdk-openjdk opencode nodejs npm rustup xdg-user-dirs
 ```
 
 fish:
@@ -108,13 +108,10 @@ sudo pacman -S --needed fastfetch ghostty
 
 ```bash
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
-curl -fsSL https://deno.land/install.sh | sh
 rustup default stable
 rustup component add clippy
 mkdir -p ~/.npm-global && npm config set prefix ~/.npm-global
 ```
-
-Accept the deno installer's offer to edit shell config. `zsh/.zshrc:98` needs `~/.deno/env` (UNVERIFIED that the installer creates it otherwise).
 
 `hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
 
@@ -135,7 +132,7 @@ chsh -s /usr/bin/zsh
 
 ## 7. Clone
 
-The repo must be at `~/Dotfiles` (hardcoded in zsh, fish, tmux).
+`~/Dotfiles` is the default location. zsh, fish and tmux resolve the real path from the stowed symlinks.
 
 ```bash
 git clone https://github.com/AmaneKai/dotfiles.git ~/Dotfiles
@@ -145,18 +142,19 @@ git checkout linux
 
 ## 8. Stow
 
-Create the parent directories first so stow links files, not whole directories. Otherwise tools that write to `~/.local/bin` write into the repo.
+Create the parent directories first so stow links files, not whole directories. Otherwise installers that write to `~/.local/bin` or `~/bin` write into the repo. Move existing shell and X start files out of the way.
 
 ```bash
-mkdir -p ~/.config ~/.local/bin
+mkdir -p ~/.config ~/.local/bin ~/bin
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
+mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow --ignore=g14-power --ignore=claude autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xresources zsh
+stow autorandr dunst fastfetch fish ghostty git i3 i3lock nmdmenu nvim polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files
 
-Copies `system/etc/` into `/etc` (synaptics config). The acpi part does nothing until `system/etc/acpi/` exists (see `docs/known-issues.md`).
+Copies `system/etc/` into `/etc` (synaptics config) and keeps numbered backups of replaced files. Prints `no etc/acpi in repo; skipped acpid setup` until `system/etc/acpi/` exists (see `docs/known-issues.md`).
 
 ```bash
 ~/Dotfiles/system/install.sh
@@ -164,16 +162,7 @@ Copies `system/etc/` into `/etc` (synaptics config). The acpi part does nothing 
 
 ## 10. Session start file
 
-Not in repo. i3 runs from `startx`.
-
-```bash
-cat > ~/.xinitrc <<'EOF'
-#!/bin/sh
-[ -f "$HOME/.Xresources" ] && xrdb -merge "$HOME/.Xresources"
-export GTK_IM_MODULE=fcitx QT_IM_MODULE=fcitx XMODIFIERS=@im=fcitx SDL_IM_MODULE=fcitx
-exec i3
-EOF
-```
+`~/.xinitrc` comes from the `xinit` stow package. It loads `~/.Xresources`, sets the fcitx input method variables, and starts i3 for `startx`.
 
 ## 11. Machine-specific
 
@@ -195,7 +184,7 @@ Log in on tty1, then:
 startx
 ```
 
-After the first X start, save the autorandr profile used by i3:
+On the CF-SV7 the `laptop` autorandr profile is already in the repo. On another machine, save your own (this overwrites the repo copy):
 
 ```bash
 autorandr --save laptop
@@ -206,6 +195,8 @@ autorandr --save laptop
 | Command | Expected |
 | --- | --- |
 | `readlink ~/.zshrc` | `Dotfiles/zsh/.zshrc` |
+| `readlink ~/.xinitrc` | `Dotfiles/xinit/.xinitrc` |
+| `readlink ~/.local/bin/fconv` | `../../Dotfiles/scripts/.local/bin/fconv` |
 | `readlink ~/.config/i3` | `../Dotfiles/i3/.config/i3` (per-file links if `~/.config/i3` already existed) |
 | `echo $SHELL` | `/usr/bin/zsh` |
 | `pacman -Qo /usr/bin/i3lock` | `/usr/bin/i3lock is owned by i3lock-color ...` |
@@ -222,4 +213,4 @@ autorandr --save laptop
 | `node --version` | `v26.x` or newer |
 | `nvim --version \| head -1` | `NVIM v0.12.x` or newer |
 | `tree-sitter --version` | `tree-sitter 0.26.x` or newer |
-| `ls /usr/lib/jvm` | `java-27-openjdk`. Compare with `JAVA_HOME` in `zsh/.zshrc:94` (hardcoded `java-26-openjdk`) |
+| `echo $JAVA_HOME` | the installed JDK directory under `/usr/lib/jvm` |
