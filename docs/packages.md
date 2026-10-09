@@ -46,6 +46,7 @@ Legend:
 | --- | --- | --- | --- | --- |
 | tmux | multiplexer | `tmux/.tmux.conf` | formula | tmux |
 | fzf | tmux-sessionizer picker | `bin/tmux-sessionizer` | formula | fzf |
+| sesh | `prefix f` picker (optional, falls back to fzf list) | `bin/tmux-sessionizer` | formula | sesh |
 | hopes | `prefix t` popup | `tmux/.tmux.conf` | manual | `~/.cargo/bin/hopes`, source UNVERIFIED |
 
 `pbcopy` ships with macOS.

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# spf wrapper: puts the `open` shim first on PATH so enter opens code in nvim.
+
+self_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+clean_path=$(printf '%s' "$PATH" | tr ':' '\n' | grep -vxF "$self_dir" | paste -sd: -)
+
+real=$(PATH=$clean_path command -v spf) || { echo "spf not found" >&2; exit 1; }
+PATH="$self_dir/spf-shim:$PATH" exec "$real" "$@"

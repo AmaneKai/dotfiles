@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# prints " branch" (with * when dirty) for the given directory, nothing outside a repo
+
+cd "${1:-.}" 2>/dev/null || exit 0
+branch=$(git symbolic-ref --short -q HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null) || exit 0
+dirty=
+[[ -n $(git status --porcelain --untracked-files=no 2>/dev/null | head -n1) ]] && dirty='*'
+printf ' %s%s ' "$branch" "$dirty"

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# spf calls `open <file>` for enter/click. Text and source files go to nvim in a
+# new tmux window instead of macOS's default app; everything else is untouched.
+
+target=${!#}
+
+if [[ -n $TMUX && -f $target ]] && file --brief --mime "$target" | grep -q '^text/\|charset=us-ascii\|charset=utf-8'; then
+    exec tmux new-window -c "$(dirname "$target")" nvim "$target"
+fi
+
+exec /usr/bin/open "$@"

@@ -10,6 +10,7 @@ Shell, terminal and editor configs for macOS, managed with GNU stow. The Linux s
 | git | git user and aliases | `~/.gitconfig` |
 | nvim | Neovim | `~/.config/nvim/` |
 | scripts | fconv, git-purge, organize-downloads, organize-screenshots, cleanup-dsstore | `~/.local/bin/` |
+| superfile | superfile (`spf`) | `~/Library/Application Support/superfile/` |
 | tmux | tmux | `~/.tmux.conf` |
 | zsh | zsh with oh-my-zsh | `~/.zshrc` |
 
