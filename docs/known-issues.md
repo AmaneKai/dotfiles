@@ -17,6 +17,7 @@ Open problems in the configs. Checked 2026-09-29 on branch `master`; line number
 | `zsh/.zshrc` | 46 | `ctags` alias to `/opt/homebrew/bin/ctags` |
 | `zsh/.zshrc` | 75 | `schd` opens `~/College/Schedule/Y2T3/image.png` |
 | `bin/tmux-sessionizer` | 4-11 | Search paths `~/Dotfiles`, `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*`, `~/LBYARCH` |
+| `bin/tmux-session-list` | 4-11 | Picker search paths `$DOTFILES`, `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/LBYARCH` |
 | `tmux/.tmux.conf` | 31-36 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads`, `~/LBYARCH` |
 | `tmux/.tmux.conf` | 38 | `$HOME/.cargo/bin/hopes` |
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
@@ -36,4 +37,4 @@ Open problems in the configs. Checked 2026-09-29 on branch `master`; line number
 | `fconv` and `git-purge` duplicate the `die`, `info`, `success` helpers | Scripts stay standalone and portable |
 | `organize-screenshots` moves every other top-level file in `~/Pictures` into `other/` | Intended behavior |
 | `discord/nocturnal-mod-old.theme.css` | Imports remote CSS from `xcruxiex.github.io` and `discordstyles.github.io`. Needed by the theme |
-| `nvim/.config/nvim` matches the `linux` branch | Same config on both branches. Debugging through gdb does not run on Apple silicon, and no LSP is configured |
+| `nvim/.config/nvim` matches the `linux` branch | Same config on both branches. Debugging through gdb does not run on Apple silicon |

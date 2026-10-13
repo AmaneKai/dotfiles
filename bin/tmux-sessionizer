@@ -40,17 +40,19 @@ switch_to_session() {
     fi
 }
 
-# running sessions + zoxide history + sesh.toml projects in one picker
+# project folders + running sessions + sesh.toml projects in one picker
 pick_with_sesh() {
     local selected
-    selected=$(sesh list --icons | fzf --reverse --ansi --no-sort \
-        --prompt='  ' --header='^a all  ^t tmux  ^g config  ^x zoxide  ^f dirs' \
-        --bind 'ctrl-a:change-prompt(  )+reload(sesh list --icons)' \
+    selected=$("$(dirname "$0")/tmux-session-list" | fzf --reverse --ansi --no-sort \
+        --prompt='  ' --header='^a all  ^t tmux  ^g config  ^f dirs' \
+        --bind 'ctrl-a:change-prompt(  )+reload('"$(dirname "$0")"'/tmux-session-list)' \
         --bind 'ctrl-t:change-prompt(  )+reload(sesh list --icons -t)' \
         --bind 'ctrl-g:change-prompt(  )+reload(sesh list --icons -c)' \
-        --bind 'ctrl-x:change-prompt(  )+reload(sesh list --icons -z)' \
         --bind 'ctrl-f:change-prompt(  )+reload(fd -H -d 2 -t d -E .Trash . ~)')
-    [[ -n "$selected" ]] && sesh connect "$selected"
+    [[ -z $selected ]] && return
+    # drop the icon prefix and expand ~ so sesh gets a plain name or path
+    selected=$(printf '%s' "$selected" | sed -E "s/^[^~\/[:alnum:]]+ *//; s|^~|$HOME|")
+    sesh connect "$selected"
 }
 
 main() {

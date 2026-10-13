@@ -1,6 +1,6 @@
 # Neovim
 
-Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local leader: `\`. No LSP; debugging through nvim-dap. External tools: see `docs/packages.md`.
+Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local leader: `\`. LSP through mason.nvim and nvim-lspconfig, Java through nvim-jdtls; debugging through nvim-dap. External tools: see `docs/packages.md`.
 
 ## Plugins
 
@@ -8,9 +8,11 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | --- | --- | --- |
 | folke/lazy.nvim | plugin manager | `lua/callo/lazy.lua` |
 | nvim-lua/plenary.nvim | library | `lua/plugins/init.lua` |
+| mason-org/mason.nvim, mason-org/mason-lspconfig.nvim, neovim/nvim-lspconfig | language servers, installed and enabled | `lua/plugins/lsp.lua` |
+| mfussenegger/nvim-jdtls | Java language server | `lua/plugins/java.lua`, `after/ftplugin/java.lua` |
 | mfussenegger/nvim-dap, rcarriga/nvim-dap-ui, nvim-neotest/nvim-nio | debugger, UI | `lua/plugins/dap.lua` |
 | mfussenegger/nvim-dap-python, leoluz/nvim-dap-go | Python, Go debug configs | `lua/plugins/dap.lua` |
-| saghen/blink.cmp, friendly-snippets, blink-cmp-spell | completion (path, snippets, buffer) | `lua/plugins/blink.lua` |
+| saghen/blink.cmp, friendly-snippets, blink-cmp-spell | completion (lsp, path, snippets, buffer) | `lua/plugins/blink.lua` |
 | stevearc/conform.nvim | formatting | `lua/plugins/conform.lua` |
 | nvim-treesitter/nvim-treesitter (`main`) | parsers, highlight | `lua/plugins/treesitter.lua` |
 | nvim-telescope/telescope.nvim | fuzzy finder | `lua/plugins/telescope.lua` |
@@ -43,7 +45,17 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | Svelte | none | prettier, eslint_d | 2 spaces |
 | HTML, CSS, JSON | none | prettier | 2 spaces |
 | Markdown | none | prettier | 4 spaces |
-| everything else (Java included) | none | none | 4 spaces |
+| Java | none | none | 4 spaces |
+| everything else | none | none | 4 spaces |
+
+Language servers:
+
+| Server | Languages | Source |
+| --- | --- | --- |
+| clangd, gopls, pyright, lua_ls, ts_ls, tinymist | C and C++, Go, Python, Lua, JavaScript and TypeScript, Typst | mason (`ensure_installed`), enabled with `vim.lsp.enable` |
+| jdtls | Java | `jdtls` on `PATH`, started per buffer by `after/ftplugin/java.lua` |
+
+jdtls uses one workspace per project under `~/.cache/nvim/jdtls/`, heap 1g to 4g, and loads `~/.local/share/lombok/lombok.jar` when present. Root markers: `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `mvnw`, `gradlew`, `.git`.
 
 Adapter locations:
 
@@ -84,6 +96,20 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | `<leader>gr`, `<leader>gb`, `<leader>gt` | n | `./gradlew` run, build, test |
 | `<leader>u` | n | undotree |
 | `<leader>f` | n | format with conform |
+
+## Keymaps: LSP
+
+Set on attach, buffer-local.
+
+| Key | Action |
+| --- | --- |
+| `gd`, `<leader>gd` | go to definition |
+| `<leader>gD` | go to declaration |
+| `<leader>gi` | go to implementation |
+| `<leader>gR` | references |
+| `<leader>rn` | rename |
+| `<leader>ca` | code action |
+| `<leader>gl` | line diagnostics |
 
 ## Keymaps: navigation
 
@@ -162,7 +188,7 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | Files | Trigger |
 | --- | --- |
 | `*.html`, `*.css`, `*.js` | text change, insert leave |
-| `*.typ` | text change, insert leave |
+| Typst buffers | text change, insert leave |
 
 ## Commands
 
@@ -174,6 +200,8 @@ Treesitter parsers: vimdoc, javascript, typescript, lua, rust, jsdoc, bash, html
 | `:TSUpdate` | update parsers |
 | `:MarkdownPreviewToggle` | browser preview on port 8081 |
 | `:MdPeekOpen` | md-peek preview |
-| `:TypstPreview` | Typst preview |
+| `:TypstPreview` | Typst preview (starts automatically when a Typst file opens) |
+| `:Mason` | language server manager |
+| `:LspInfo` | attached language servers |
 | `:LiveServerStart`, `:LiveServerStop` | live server on port 6767 |
 | `:IronRepl` | ipython REPL |

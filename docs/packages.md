@@ -46,7 +46,7 @@ Legend:
 | --- | --- | --- | --- | --- |
 | tmux | multiplexer | `tmux/.tmux.conf` | formula | tmux |
 | fzf | tmux-sessionizer picker | `bin/tmux-sessionizer` | formula | fzf |
-| sesh | `prefix f` picker (optional, falls back to fzf list) | `bin/tmux-sessionizer` | formula | sesh |
+| sesh | `prefix f` picker, running sessions and `sesh.toml` projects (optional, falls back to fzf list) | `bin/tmux-sessionizer`, `bin/tmux-session-list` | formula | sesh |
 | hopes | `prefix t` popup | `tmux/.tmux.conf` | manual | `~/.cargo/bin/hopes`, source UNVERIFIED |
 
 `pbcopy` ships with macOS.
@@ -76,12 +76,13 @@ Legend:
 | node, npm | markdown-preview, md-peek, live-server, js-debug | `lua/plugins/markdown.lua`, `md-peek.lua`, `liveserver.lua`, `dap.lua` | formula | node |
 | Brave | live-server opens `brave browser` | `lua/plugins/liveserver.lua` | cask | brave-browser |
 | gdb | C, C++, Rust debugging | `lua/plugins/dap.lua` | formula | gdb, does not run on Apple silicon, UNVERIFIED on Intel |
+| jdtls | Java language server | `after/ftplugin/java.lua` | formula | jdtls |
 | delve | Go debugging | `lua/plugins/dap.lua` | formula | delve |
 | debugpy | Python debugging | `lua/plugins/dap.lua` | manual | see Manual installs |
 | js-debug | JavaScript, TypeScript debugging | `lua/plugins/dap.lua` | manual | see Manual installs |
 | netcoredbg | C# debugging | `lua/plugins/dap.lua` | manual | see Manual installs |
 
-No LSP is configured. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`). Debug adapter paths in `dap.lua` match the Manual installs recipes.
+Language servers other than jdtls are installed by mason.nvim (`lua/plugins/lsp.lua`). Lombok is optional: place `lombok.jar` at `~/.local/share/lombok/lombok.jar`. typst-preview.nvim downloads its own binaries (`lua/plugins/typst.lua`). Debug adapter paths in `dap.lua` match the Manual installs recipes.
 
 ## scripts
 

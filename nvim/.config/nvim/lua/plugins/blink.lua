@@ -22,7 +22,7 @@ return {
         accept = { auto_brackets = { enabled = false } },
       },
       sources = {
-        default = { "path", "snippets", "buffer" },
+        default = { "lsp", "path", "snippets", "buffer" },
         providers = {
           spell = {
             name = "Spell",
