@@ -32,7 +32,6 @@ Symptom, cause, fix.
 | `<leader>f` formats nothing | Formatter missing (ruff, prettier, eslint_d) | Install per `docs/packages.md` |
 | No completion or hover from a language server | Server not installed, or not attached | `:Mason` to install, `:LspInfo` to check the attached servers |
 | Java has no completion or diagnostics | `jdtls` not on `PATH`, or no project root marker found | `brew install jdtls`, then open the file from a Maven, Gradle or git project. Clear a broken index with `rm -rf ~/.cache/nvim/jdtls` |
-| New project folder missing from the `prefix f` picker | Parent folder not in the scan list | Add it to `SEARCH_PATHS` in `bin/tmux-session-list` |
 | `<leader>cc` says no configuration for the filetype | No adapter defined for that language | Supported: C, C++, Rust, Python, Go, JS, TS, C#. See `docs/neovim.md` |
 | Debug session starts and exits at once | Adapter not installed or not at the expected path | Check `dlv version`, `netcoredbg --version`, `ls ~/.local/share/nvim/js-debug/src/dapDebugServer.js`, `~/.local/share/nvim/debugpy/bin/python -c "import debugpy"` |
 | C, C++ or Rust debugging cannot start | `gdb` does not run on Apple silicon | No fix in the repo. lldb is not configured |

@@ -17,7 +17,6 @@ Open problems in the configs. Checked 2026-09-29 on branch `master`; line number
 | `zsh/.zshrc` | 46 | `ctags` alias to `/opt/homebrew/bin/ctags` |
 | `zsh/.zshrc` | 75 | `schd` opens `~/College/Schedule/Y2T3/image.png` |
 | `bin/tmux-sessionizer` | 4-11 | Search paths `~/Dotfiles`, `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*`, `~/LBYARCH` |
-| `bin/tmux-session-list` | 4-11 | Picker search paths `$DOTFILES`, `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/LBYARCH` |
 | `tmux/.tmux.conf` | 31-36 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads`, `~/LBYARCH` |
 | `tmux/.tmux.conf` | 38 | `$HOME/.cargo/bin/hopes` |
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
