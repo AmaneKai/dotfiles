@@ -1,6 +1,6 @@
 set $mod Mod4
 
-font pango:JetBrainsMono Nerd Font, Source Han Sans JP 9
+font pango:Roboto Mono, JetBrainsMono Nerd Font, Source Han Sans JP 9
 
 for_window [class=".*"] border pixel 1
 default_border pixel 1

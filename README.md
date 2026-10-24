@@ -15,6 +15,7 @@ i3 (X11) desktop, shell, and editor configs for Arch, Fedora, and the Debian fam
 | gtk | GTK 2/3/4 theme, icons, cursor | `~/.config/gtk-3.0/`, `~/.config/gtk-4.0/`, `~/.gtkrc-2.0`, `~/.icons/default/` |
 | i3 | window manager, audio, bluetooth and power menus, OSD, lock image generator | `~/.config/i3/` |
 | i3lock | lock screen script | `~/bin/lock.sh` |
+| kde | Plasma Rose Pine color scheme (`plasma-apply-colorscheme RosePine`) | `~/.local/share/color-schemes/` |
 | nmdmenu | networkmanager-dmenu | `~/.config/networkmanager-dmenu/config.ini` |
 | nvim | Neovim | `~/.config/nvim/` |
 | picom | optional compositor config, not started by i3 | `~/.config/picom/picom.conf` |

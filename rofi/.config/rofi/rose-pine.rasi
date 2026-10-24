@@ -1,5 +1,5 @@
 * {
-    font:              "JetBrainsMono Nerd Font 11";
+    font:              "Roboto Mono 11";
 
     base:              #191724;
     surface:           #1f1d2e;
@@ -103,7 +103,7 @@ element normal.active {
 }
 element normal.active element-text {
     text-color:        @muted;
-    font:              "JetBrainsMono Nerd Font 9";
+    font:              "Roboto Mono 9";
 }
 element selected.active {
     background-color:  transparent;
@@ -111,7 +111,7 @@ element selected.active {
 }
 element selected.active element-text {
     text-color:        @muted;
-    font:              "JetBrainsMono Nerd Font 9";
+    font:              "Roboto Mono 9";
 }
 
 element normal.urgent element-text {

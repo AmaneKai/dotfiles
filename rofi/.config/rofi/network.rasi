@@ -1,7 +1,7 @@
 @import "default"
 
 * {
-    font:                       "JetBrainsMono Nerd Font 11";
+    font:                       "Roboto Mono 11";
 
     background:                 #191724;
     foreground:                 #e0def4;

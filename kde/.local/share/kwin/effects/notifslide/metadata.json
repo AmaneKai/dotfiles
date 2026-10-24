@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Authors": [{ "Name": "Amane" }],
+        "Category": "Appearance",
+        "Description": "Slide notification popups in from the right screen edge",
+        "EnabledByDefault": false,
+        "Id": "notifslide",
+        "License": "MIT",
+        "Name": "Notification slide-in"
+    },
+    "KPackageStructure": "KWin/Effect",
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

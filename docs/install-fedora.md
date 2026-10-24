@@ -182,6 +182,8 @@ sudo localectl set-x11-keymap jp jp106 "" terminate:ctrl_alt_bksp
 chsh -s /usr/bin/zsh
 ```
 
+On Plasma, apply the color scheme from the `kde` package with `plasma-apply-colorscheme RosePine`.
+
 ## 7. Clone
 
 `~/Dotfiles` is the default location. zsh, fish and tmux resolve the real path from the stowed symlinks.
@@ -201,7 +203,7 @@ mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.ico
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
 mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow autorandr dunst fastfetch fish ghostty git gtk i3 i3lock nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
+stow autorandr dunst fastfetch fish ghostty git gtk i3 i3lock kde nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files

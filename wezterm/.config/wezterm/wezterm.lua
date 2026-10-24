@@ -8,7 +8,8 @@ config.colors = {
 }
 
 config.font = wezterm.font_with_fallback {
-  'JetBrainsMono Nerd Font',
+  'Roboto Mono',
+  'JetBrainsMono Nerd Font', -- icon glyphs
   'Noto Sans CJK JP',
   'Noto Color Emoji',
 }

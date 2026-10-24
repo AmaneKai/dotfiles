@@ -16,7 +16,8 @@ fi
 
 export EDITOR="nvim"
 export VISUAL="nvim"
-export QT_QPA_PLATFORMTHEME="qt5ct"
+# Plasma sets its own Qt platform theme; qt5ct only for other desktops (i3)
+[[ "$XDG_CURRENT_DESKTOP" != *KDE* ]] && export QT_QPA_PLATFORMTHEME="qt5ct"
 
 export MESA_GL_VERSION_OVERRIDE=4.5
 export MESA_GLSL_VERSION_OVERRIDE=450

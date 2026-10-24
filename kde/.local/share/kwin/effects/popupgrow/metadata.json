@@ -1,0 +1,14 @@
+{
+    "KPlugin": {
+        "Authors": [{ "Name": "Amane" }],
+        "Category": "Appearance",
+        "Description": "Slide Plasma popups in from the nearest screen side (left half from the left, right half from the right)",
+        "EnabledByDefault": false,
+        "Id": "popupgrow",
+        "License": "MIT",
+        "Name": "Popup slide"
+    },
+    "KPackageStructure": "KWin/Effect",
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

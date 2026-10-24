@@ -12,7 +12,7 @@
 	red: #eb6f92;
 	yel: #f6c177;
 
-	font: "Cartograph CF 12";
+	font: "Roboto Mono 12";
 
 	foreground: @fgd;
 	background: @bg;

@@ -1,0 +1,8 @@
+{
+    "KPlugin": {
+        "Authors": [{ "Name": "Amane" }],
+        "Id": "RosePineGlass",
+        "License": "LGPL-2.0-or-later",
+        "Name": "Rose Pine Glass"
+    }
+}

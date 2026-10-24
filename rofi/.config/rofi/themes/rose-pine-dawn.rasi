@@ -14,7 +14,7 @@
 
 	alt-fgd: #faf4ed;
 
-	font: "Cartograph CF 12";
+	font: "Roboto Mono 12";
 
 	foreground: @fgd;
 	background: @bg;
