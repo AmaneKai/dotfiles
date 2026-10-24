@@ -87,6 +87,8 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | lazy.nvim errors on plenary or rockspec | luarocks missing | Install luarocks, or set `rocks = { enabled = false }` in `lazy.setup` |
+| No completion or hover from a language server | Server not installed, or not attached | `:Mason` to install, `:LspInfo` to check the attached servers |
+| Java has no completion or diagnostics | `jdtls` not on `PATH`, or no project root marker found | Install `jdtls` (see `docs/packages.md`), then open the file from a Maven, Gradle or git project. Clear a broken index with `rm -rf ~/.cache/nvim/jdtls` |
 | nvim-treesitter fails to build parsers | Neovim below 0.12 or tree-sitter-cli below 0.26.1 | Install newer versions. See `docs/packages.md` |
 | `<leader>f` formats nothing | Formatter missing (ruff, prettier, eslint_d) | Install per `docs/packages.md` |
 | `<leader>cc` says no configuration for the filetype | No adapter defined for that language | Supported: C, C++, Rust, Python, Go, JS, TS, C#. See `docs/neovim.md` |
