@@ -5,6 +5,7 @@ local servers = {
   "lua_ls",
   "ts_ls",
   "tinymist",
+  "ltex_plus",
 }
 
 return {
@@ -27,6 +28,19 @@ return {
 
       vim.lsp.config("lua_ls", {
         settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+      })
+      local dict_path = vim.fn.stdpath("config") .. "/spell/ltex-dictionary.txt"
+      vim.lsp.config("ltex_plus", {
+        filetypes = { "markdown", "text", "tex", "typst" },
+        settings = {
+          ltex = {
+            language = "en-US",
+            dictionary = {
+              ["en-US"] = vim.fn.filereadable(dict_path) == 1 and vim.fn.readfile(dict_path) or {},
+            },
+            additionalRules = { enablePickyRules = true },
+          },
+        },
       })
       vim.lsp.enable(servers)
 

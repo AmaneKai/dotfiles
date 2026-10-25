@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/hopes-impl"
+HOPES_RUST="${HOPES_RUST:-$HOME/.cargo/bin/hopes}"
+HOPES_C="${HOPES_C:-$HOME/Github/hopes-C/build/hopes}"
+
+current() {
+    cat "$STATE_FILE" 2>/dev/null || echo rust
+}
+
+set_impl() {
+    mkdir -p "$(dirname "$STATE_FILE")"
+    echo "$1" > "$STATE_FILE"
+    echo "hopes -> $1"
+}
+
+size_of() {
+    [[ -x "$1" ]] && wc -c < "$1" | tr -d ' ' || echo missing
+}
+
+status() {
+    echo "active: $(current)"
+    echo "rust:   $HOPES_RUST ($(size_of "$HOPES_RUST") bytes)"
+    echo "c:      $HOPES_C ($(size_of "$HOPES_C") bytes)"
+}
+
+case "${1:-toggle}" in
+c | rust) set_impl "$1" ;;
+toggle) [[ "$(current)" == c ]] && set_impl rust || set_impl c ;;
+status) status ;;
+*)
+    echo "usage: hopes-switch [c|rust|toggle|status]" >&2
+    exit 2
+    ;;
+esac

@@ -69,9 +69,13 @@ alias ytdl-mp4="yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/b
 
 alias g='git'
 compdef g=git
-zstyle ':completion:*:*:git:*' user-commands purge:'delete a branch locally and on its remote'
-_git-purge() {
-    _arguments '1:branch:__git_branch_names' '2:remote:__git_remotes'
+# Homebrew's _git delegates to git-completion.bash, which looks up _git_<cmd>
+# (run under ksh emulation) instead of zsh's _git-<cmd>.
+_git_purge() {
+    case "$cword" in
+    2) __gitcomp_nl "$(git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null)" ;;
+    3) __gitcomp_nl "$(git remote 2>/dev/null)" ;;
+    esac
 }
 
 alias schd='open "$HOME/College/Schedule/Y2T3/image.png"'

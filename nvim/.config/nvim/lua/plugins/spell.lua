@@ -6,16 +6,18 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern  = { "typst", "markdown", "text", "tex" },
         callback = function()
-          vim.wo.spell = true
-          vim.opt_local.spelllang = "en_us"
+          -- ltex_plus (LSP) does the checking; built-in spell stays off to avoid double underlines
+          vim.wo.spell = false
 
           vim.keymap.set("n", "<leader>ss", function()
-            vim.wo.spell = not vim.wo.spell
-            print("Spell check: " .. (vim.wo.spell and "ON" or "OFF"))
-          end, { buffer = true, desc = "Toggle spell check" })
+            local on = not vim.diagnostic.is_enabled({ bufnr = 0 })
+            vim.diagnostic.enable(on, { bufnr = 0 })
+            print("Grammar/spell check: " .. (on and "ON" or "OFF"))
+          end, { buffer = true, desc = "Toggle grammar/spell check" })
 
-          vim.keymap.set("n", "<leader>sa", "zg", { buffer = true, silent = true })
-          vim.keymap.set("n", "<leader>sc", "z=", { buffer = true, silent = true })
+          vim.keymap.set("n", "<leader>sc", vim.lsp.buf.code_action, { buffer = true, desc = "Fix suggestion" })
+          vim.keymap.set("n", "]s", vim.diagnostic.goto_next, { buffer = true })
+          vim.keymap.set("n", "[s", vim.diagnostic.goto_prev, { buffer = true })
         end,
       })
 

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/hopes-impl"
+HOPES_RUST="${HOPES_RUST:-$HOME/.cargo/bin/hopes}"
+HOPES_C="${HOPES_C:-$HOME/Github/hopes/build/hopes}"
+
+impl="${HOPES_IMPL:-$(cat "$STATE_FILE" 2>/dev/null)}"
+
+case "${impl:-c}" in
+c) target="$HOPES_C" ;;
+rust) target="$HOPES_RUST" ;;
+*)
+    echo "hopes: HOPES_IMPL must be 'c' or 'rust', got '$impl'" >&2
+    exit 2
+    ;;
+esac
+
+if [[ ! -x "$target" ]]; then
+    echo "hopes: $target not found (build it first)" >&2
+    exit 1
+fi
+
+exec "$target" "$@"
