@@ -29,7 +29,7 @@ Config in `nvim/.config/nvim`. Plugin manager: lazy.nvim. Leader: `Space`. Local
 | iamcco/markdown-preview.nvim | Markdown preview in browser | `lua/plugins/markdown.lua` |
 | chomosuke/typst-preview.nvim | Typst preview | `lua/plugins/typst.lua` |
 | barrettruth/live-server.nvim | HTML live reload | `lua/plugins/liveserver.lua` |
-| spell-config (local) | spell check for prose | `lua/plugins/spell.lua` |
+| spell-config (local) | prose keymaps, built-in `spell` off (ltex_plus checks instead) | `lua/plugins/spell.lua` |
 
 ## Languages
 
@@ -53,7 +53,10 @@ Language servers:
 | Server | Languages | Source |
 | --- | --- | --- |
 | clangd, gopls, pyright, lua_ls, ts_ls, tinymist | C and C++, Go, Python, Lua, JavaScript and TypeScript, Typst | mason (`ensure_installed`), enabled with `vim.lsp.enable` |
+| ltex_plus (ltex-ls-plus) | grammar and spelling for Markdown, text, TeX, Typst | mason (`ensure_installed`), enabled with `vim.lsp.enable` |
 | jdtls | Java | `jdtls` on `PATH`, started per buffer by `after/ftplugin/java.lua` |
+
+ltex_plus is LanguageTool: `en-US`, picky rules on (`enablePickyRules` in `lua/plugins/lsp.lua`). Custom words go in `nvim/.config/nvim/spell/ltex-dictionary.txt`, one per line, read at startup. "Add to dictionary" in the code action lasts only for the session. The first start is slow while the server loads.
 
 jdtls uses one workspace per project under `~/.cache/nvim/jdtls/`, heap 1g to 4g, and loads `~/.local/share/lombok/lombok.jar` when present. Root markers: `pom.xml`, `build.gradle`, `build.gradle.kts`, `settings.gradle`, `mvnw`, `gradlew`, `.git`.
 
@@ -166,7 +169,8 @@ Set on attach, buffer-local.
 | `<leader>jR`, `<leader>jq`, `<leader>jl` | iron restart, exit, clear | global |
 | `<leader>j<space>` | iron interrupt | global |
 | `<leader>io`, `<leader>ic`, `<leader>ir`, `<leader>iR`, `<leader>iK` | ipynb-peek open, close, run cell, run all, restart kernel | `.ipynb` |
-| `<leader>ss`, `<leader>sa`, `<leader>sc` | spell toggle, add word, suggest | typst, markdown, text, tex |
+| `<leader>ss`, `<leader>sc` | grammar and spell diagnostics toggle, fix suggestion (code action) | typst, markdown, text, tex |
+| `]s`, `[s` | next, previous issue | typst, markdown, text, tex |
 | `<C-y>` | emmet leader | HTML, CSS, JS, JSX, TSX |
 | `<C-Space>` | completion menu, docs | insert |
 
