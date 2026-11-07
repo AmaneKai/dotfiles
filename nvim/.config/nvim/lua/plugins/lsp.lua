@@ -4,7 +4,6 @@ local servers = {
   "pyright",
   "lua_ls",
   "ts_ls",
-  "tinymist",
   "ltex_plus",
 }
 
@@ -31,7 +30,7 @@ return {
       })
       local dict_path = vim.fn.stdpath("config") .. "/spell/ltex-dictionary.txt"
       vim.lsp.config("ltex_plus", {
-        filetypes = { "markdown", "text", "tex", "typst" },
+        filetypes = { "markdown", "text", "tex" },
         settings = {
           ltex = {
             language = "en-US",
