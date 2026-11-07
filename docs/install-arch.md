@@ -125,7 +125,7 @@ curl -fsSL https://github.com/Samsung/netcoredbg/releases/latest/download/netcor
 ln -sf ~/.local/share/netcoredbg/netcoredbg ~/.local/bin/netcoredbg
 ```
 
-`hopes` (tmux `prefix t`): source UNVERIFIED. Must end up at `~/.cargo/bin/hopes`.
+`hopes` (tmux `prefix t`): Go program from https://github.com/AmaneKai/hopes. Run `go install github.com/AmaneKai/hopes@latest` so it lands in `$(go env GOPATH)/bin`, which zsh and fish add to PATH. Remove any older `hopes` from `/usr/local/bin` or `~/.cargo/bin`, since those come earlier in PATH.
 
 ## 5. Services
 

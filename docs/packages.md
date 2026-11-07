@@ -164,7 +164,7 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | tmux | multiplexer | `tmux/.tmux.conf` | tmux | tmux | tmux |
 | xclip | copy to clipboard | `tmux/.tmux.conf` | xclip | xclip | xclip |
 | fzf | sessionizer | `bin/tmux-sessionizer` | fzf | fzf | fzf |
-| hopes | popup on `prefix t` / `prefix T` | `tmux/.tmux.conf` | UNVERIFIED (not in repos, AUR, or crates.io) | UNVERIFIED | UNVERIFIED |
+| hopes | popup on `prefix t` / `prefix T` | `tmux/.tmux.conf` | manual (go install) | manual (go install) | manual (go install) |
 
 ## nvim package
 
@@ -238,7 +238,7 @@ Language servers other than jdtls are installed by mason.nvim (`lua/plugins/lsp.
 | i3lock-color | Clone https://github.com/Raymo111/i3lock-color and run `./install-i3lock-color.sh`. Build dependencies: see its README (UNVERIFIED per distro) |
 | wezterm apt repo | See `docs/install-debian.md` |
 | gradle | Download from https://services.gradle.org/distributions/ or use SDKMAN (UNVERIFIED) |
-| hopes | UNVERIFIED. Must end up at `~/.cargo/bin/hopes` |
+| hopes | `go install github.com/AmaneKai/hopes@latest` (needs Go 1.26+, installs to `$(go env GOPATH)/bin`) |
 
 ## Not stow packages
 

@@ -8,7 +8,7 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | --- | --- |
 | synclient decimal options | MinSpeed, MaxSpeed, AccelFactor, CircScrollDelta are not set anywhere. Values unknown |
 | Wallpaper `~/Downloads/png/eclipse.png` | Black background on a fresh machine (`i3/.config/i3/config:8`) |
-| hopes | `prefix t` and `prefix T` open an empty popup until `~/.cargo/bin/hopes` exists. Source unknown |
+| hopes | `prefix t` and `prefix T` open an empty popup until `hopes` is on PATH. Install with `go install github.com/AmaneKai/hopes@latest` |
 
 ## Hardcoded values
 
@@ -22,7 +22,7 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | `autorandr/.config/autorandr/laptop/` | all | Profile for the CF-SV7 panel (`eDP-1`, 1920x1200). `autorandr --save laptop` on another machine overwrites it in the repo |
 | `bin/tmux-sessionizer` | 3-11 | Search paths `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*` |
 | `tmux/.tmux.conf` | 30-33 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads` |
-| `tmux/.tmux.conf` | 36 | `$HOME/.cargo/bin/hopes` |
+| `tmux/.tmux.conf` | 36 | `hopes` resolved from PATH. A copy in `/usr/local/bin` shadows `$(go env GOPATH)/bin` |
 | `dunst/.config/dunst/dunstrc` | 21 | `/usr/share/icons/Papirus-Dark/32x32/` |
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
 | `nvim/.config/nvim/lua/plugins/markdown.lua` | 14 | Port 8081 |
