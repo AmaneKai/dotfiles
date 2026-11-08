@@ -1,0 +1,73 @@
+configuration {
+    modi: "drun";
+    font: "Roboto Mono 10";
+    show-icons: true;
+    icon-theme: "Papirus-Dark";
+    display-drun: " ";
+}
+
+@theme "/dev/null"
+
+* {
+    bg:          #191724d9;
+    bg-alt:      #1f1d2ee6;
+    fg:          #e0def4;
+    fg-muted:    #908caa;
+    accent:      #c4a7e7;
+    rose:        #ebbcba;
+
+    background-color: transparent;
+    text-color: @fg;
+}
+
+window {
+    width: 480px;
+    background-color: @bg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 0px;
+    padding: 14px;
+}
+
+mainbox {
+    spacing: 10px;
+}
+
+inputbar {
+    background-color: @bg-alt;
+    border-radius: 0px;
+    padding: 8px 12px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @accent;
+    padding: 0 8px 0 0;
+}
+
+listview {
+    lines: 7;
+    columns: 1;
+    fixed-height: false;
+    spacing: 4px;
+}
+
+element {
+    padding: 8px 10px;
+    border-radius: 0px;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: #191724;
+}
+
+element-icon {
+    size: 24px;
+    padding: 0 10px 0 0;
+}
+
+element-text {
+    vertical-align: 0.5;
+    text-color: inherit;
+}
