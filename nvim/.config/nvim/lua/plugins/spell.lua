@@ -6,7 +6,6 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern  = { "typst", "markdown", "text", "tex" },
         callback = function()
-          -- ltex_plus (LSP) does the checking; built-in spell stays off to avoid double underlines
           vim.wo.spell = false
 
           vim.keymap.set("n", "<leader>ss", function()
