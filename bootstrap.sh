@@ -121,12 +121,38 @@ step_installers() {
     fi
   fi
   run go install github.com/AmaneKai/hopes@latest
+
+  # hopes task data (private repo; needs `gh auth login` first, otherwise skipped)
+  if [ ! -d "$HOME/hopes-data" ]; then
+    if command -v gh >/dev/null && gh auth status >/dev/null 2>&1; then
+      run gh repo clone AmaneKai/hopes-data "$HOME/hopes-data"
+    else
+      note "gh not logged in; later run: gh auth login && gh repo clone AmaneKai/hopes-data ~/hopes-data"
+    fi
+  fi
+  if [ ! -e "$HOME/.config/hopes/config.toml" ]; then
+    put "$HOME/.config/hopes/config.toml" <<EOT
+[sync]
+enabled = true
+debounce_seconds = 5
+data_dir = "$HOME/hopes-data"
+remote = "origin"
+branch = "main"
+pull_on_startup = true
+EOT
+  fi
 }
 
 step_system() {
   log "System settings (shell, services, locale, keymap)"
   run sudo chsh -s /usr/bin/zsh "$USER"
   run sudo systemctl enable --now NetworkManager bluetooth
+
+  # Wifi power saving off: removes latency spikes on idle connections (costs a little battery)
+  if [ "$DRY" = 1 ]; then note "[dry-run] write /etc/NetworkManager/conf.d/wifi-powersave.conf"; else
+    printf '[connection]\nwifi.powersave = 2\n' | sudo tee /etc/NetworkManager/conf.d/wifi-powersave.conf >/dev/null
+    sudo systemctl reload NetworkManager || true
+  fi
 
   run sudo sed -i 's/^#\(en_US.UTF-8 UTF-8\)/\1/; s/^#\(ja_JP.UTF-8 UTF-8\)/\1/' /etc/locale.gen
   run sudo locale-gen
