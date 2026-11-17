@@ -3,14 +3,16 @@
 STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/hopes-impl"
 HOPES_RUST="${HOPES_RUST:-$HOME/.cargo/bin/hopes}"
 HOPES_C="${HOPES_C:-$HOME/Github/hopes/build/hopes}"
+HOPES_GO="${HOPES_GO:-$HOME/go/bin/hopes}"
 
 impl="${HOPES_IMPL:-$(cat "$STATE_FILE" 2>/dev/null)}"
 
-case "${impl:-c}" in
+case "${impl:-go}" in
+go) target="$HOPES_GO" ;;
 c) target="$HOPES_C" ;;
 rust) target="$HOPES_RUST" ;;
 *)
-    echo "hopes: HOPES_IMPL must be 'c' or 'rust', got '$impl'" >&2
+    echo "hopes: HOPES_IMPL must be 'go', 'c' or 'rust', got '$impl'" >&2
     exit 2
     ;;
 esac
