@@ -32,6 +32,8 @@ Not stowed: `bin/` (added to PATH by zsh and fish), `system/` (copied to `/etc` 
 
 ## Quick start
 
+Arch or CachyOS with KDE Plasma (Wayland): clone the repo, check out `linux`, run `./bootstrap.sh` (`--dry-run` to preview, `--skip <step>` / `--only <step>` with steps `packages aur stow installers system kde`), then log out and back in. It installs packages, stows `fish ghostty git nvim tmux fastfetch scripts zsh kde`, and sets locale, Japanese layout and input, Roboto Mono and the wallpaper. SSH keys and logins are not restored. The manual steps for i3 and other distros follow.
+
 1. Install packages for your distro: [Arch](docs/install-arch.md), [Fedora](docs/install-fedora.md), [Debian family](docs/install-debian.md).
 2. Clone and check out `linux`. `~/Dotfiles` is the default location; zsh, fish and tmux resolve the real path from the symlinks.
 3. Run `mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons`.

@@ -1,6 +1,6 @@
 # Install on Arch
 
-Fresh install on Arch or CachyOS (same package names, UNVERIFIED for CachyOS-only repos). Package names match `docs/packages.md`. Run each block in order. Skip groups for stow packages you do not use.
+Fresh install on Arch or CachyOS (same package names, UNVERIFIED for CachyOS-only repos). Package names match `docs/packages.md`. For KDE Plasma on Wayland, run `~/Dotfiles/bootstrap.sh` instead of the blocks below. For the i3 setup, run each block in order. Skip groups for stow packages you do not use.
 
 ## 1. Base
 
