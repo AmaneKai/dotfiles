@@ -2,7 +2,7 @@ set -g fish_greeting
 
 set -gx EDITOR nvim
 set -gx VISUAL nvim
-set -gx QT_QPA_PLATFORMTHEME qt5ct
+set -gx QT_QPA_PLATFORMTHEME kde
 set -gx MESA_GL_VERSION_OVERRIDE 4.5
 set -gx MESA_GLSL_VERSION_OVERRIDE 450
 set -gx vblank_mode 0
@@ -62,3 +62,7 @@ if status is-interactive
         $HOME/.local/bin/organize-downloads --quiet
     end
 end
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/home/amane/.local/bin" $PATH

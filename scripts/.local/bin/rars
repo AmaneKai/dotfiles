@@ -1,0 +1,6 @@
+#!/bin/sh
+# RARS launcher without the GTK look-and-feel that /usr/bin/rars forces
+# (the global GTK theme looks bad in Swing). Uses Java's default Metal L&F.
+exec /usr/bin/java \
+    -Dawt.useSystemAAFontSettings=on \
+    -jar /usr/share/java/rars/rars.jar "$@"

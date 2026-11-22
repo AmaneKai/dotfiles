@@ -16,8 +16,8 @@ fi
 
 export EDITOR="nvim"
 export VISUAL="nvim"
-# Plasma sets its own Qt platform theme; qt5ct only for other desktops (i3)
-[[ "$XDG_CURRENT_DESKTOP" != *KDE* ]] && export QT_QPA_PLATFORMTHEME="qt5ct"
+# Plasma sets its own Qt platform theme; use plasma-integration (kde) on other desktops (i3)
+[[ "$XDG_CURRENT_DESKTOP" != *KDE* ]] && export QT_QPA_PLATFORMTHEME="kde"
 
 export MESA_GL_VERSION_OVERRIDE=4.5
 export MESA_GLSL_VERSION_OVERRIDE=450
@@ -89,3 +89,7 @@ fi
 [[ -f "$HOME/.deno/env" ]] && source "$HOME/.deno/env"
 
 [[ -x "$HOME/.local/bin/organize-downloads" ]] && "$HOME/.local/bin/organize-downloads" --quiet
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/amane/.local/bin:$PATH"

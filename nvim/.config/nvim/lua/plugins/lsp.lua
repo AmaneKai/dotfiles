@@ -45,6 +45,11 @@ return {
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(ev)
+          -- Navigation only: hide diagnostics (except ltex spell/grammar)
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
+          if client and client.name ~= "ltex_plus" then
+            vim.diagnostic.enable(false, { bufnr = ev.buf })
+          end
           local function map(lhs, fn, desc)
             vim.keymap.set("n", lhs, fn, { buffer = ev.buf, desc = "LSP: " .. desc })
           end

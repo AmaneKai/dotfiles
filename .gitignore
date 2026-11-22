@@ -1,3 +1,4 @@
 .DS_Store
 scripts/.local/bin/claude
 scripts/.local/bin/python3.13
+.sentry-native/
