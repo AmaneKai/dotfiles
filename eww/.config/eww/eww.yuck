@@ -1,0 +1,31 @@
+;; Current track title as upright vertical text on the right edge.
+;; Not exclusive: an exclusive strip would also shrink the Waybar bars. Hyprland
+;; widens the right outer gap for tiled windows instead (TITLE_COLUMN_WIDTH in hyprland.lua,
+;; keep it equal to the :width below).
+;; track-title.sh prints a JSON array of single characters per change.
+(deflisten titlechars :initial "[]"
+  "~/.config/eww/scripts/track-title.sh")
+
+(defwidget title-column []
+  (box :class "title-column"
+       :orientation "v"
+       :space-evenly false
+       :halign "center"
+       :valign "center"
+    (for ch in titlechars
+      (label :class "ch" :text ch))))
+
+;; Nothing playing -> no characters -> the box has no height, so the strip is gone.
+
+(defwindow track
+  :monitor 0
+  :namespace "eww-track"
+  :stacking "fg"
+  :exclusive false
+  :focusable false
+  :geometry (geometry :anchor "center right"
+                      :x "0px"
+                      :y "0px"
+                      :width "24px"
+                      :height "0px")
+  (title-column))

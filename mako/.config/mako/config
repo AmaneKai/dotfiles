@@ -1,17 +1,51 @@
-font=Roboto Mono 10
-anchor=top-right
-margin=4
-padding=12
-width=320
-border-size=2
+# macOS-proportioned banners in the library palette. bg #0a1626  text #f6e7c0
+# muted #a39682  rule rgba(246,231,192,.16)  accent #ce8563. Alpha colours are #RRGGBBAA.
+font=Noto Sans 9
+background-color=#0a1626d9
+text-color=#f6e7c0
+border-color=#f6e7c029
+border-size=1
 border-radius=0
-default-timeout=5000
+progress-color=over #f6e7c01f
 
-background-color=#1f1d2ed9
-text-color=#e0def4
-border-color=#c4a7e7
-progress-color=over #26233a
+# bold title over a lighter body, like a macOS banner
+format=<b>%s</b>\n<span foreground='#a39682'>%b</span>
 
-[urgency=high]
-border-color=#eb6f92
+anchor=top-right
+layer=overlay
+width=290
+height=100
+padding=8,10
+margin=4
+outer-margin=8,12
+default-timeout=6000
+
+icons=1
+icon-path=/usr/share/icons/breeze-dark:/usr/share/icons/breeze:/usr/share/icons/Adwaita:/usr/share/icons/hicolor:/usr/share/pixmaps
+max-icon-size=26
+icon-border-radius=0
+icon-location=left
+
+[urgency=low]
+border-color=#283a51
+default-timeout=4000
+
+[urgency=critical]
+border-color=#ce8563
 default-timeout=0
+
+# volume / brightness (scripts/osd.sh): a small capsule, icon plus a level fill, no
+# text, like the macOS HUD. The terracotta fill is the level.
+[app-name=osd]
+anchor=bottom-center
+width=150
+height=30
+padding=6,12
+outer-margin=0,0,72,0
+border-radius=0
+format=
+icon-location=left
+max-icon-size=16
+icon-border-radius=0
+progress-color=over #ce8563b3
+default-timeout=1300

@@ -1,0 +1,204 @@
+/* Library launcher. Palette: bg #0a1626  surface #283a51  text #f6e7c0
+   muted #a39682  accent #ce8563. Colours with alpha are #RRGGBBAA. */
+
+configuration {
+    font: "Zen Kaku Gothic New, Noto Sans CJK JP 12";
+    show-icons: true;
+    matching: "fuzzy";
+    sort: true;
+    case-sensitive: false;
+
+    /* tabs are modes: Tab / Shift+Tab move between the drawers */
+    kb-mode-next: "Tab,Control+Tab,Shift+Right,Control+l";
+    kb-mode-previous: "ISO_Left_Tab,Control+ISO_Left_Tab,Shift+Left,Control+h";
+    kb-element-next: "";
+    kb-element-prev: "";
+
+    /* vim-style motions (unlabelled): Ctrl+j/k move, Ctrl+h/l switch drawer.
+       They take over Ctrl+j (accept), Ctrl+k (kill to end of line), Ctrl+h
+       (backspace) and Ctrl+l (mode-complete); Return and BackSpace still work. */
+    kb-row-down: "Down,Control+n,Control+j";
+    kb-row-up: "Up,Control+p,Control+k";
+    kb-accept-entry: "Control+m,Return,KP_Enter";
+    kb-remove-to-eol: "";
+    kb-remove-char-back: "BackSpace,Shift+BackSpace";
+    kb-mode-complete: "";
+
+    display-all: "<span font_family='Shippori Mincho' weight='bold' foreground='#ce8563'>I</span>  All";
+    display-apps: "<span font_family='Shippori Mincho' weight='bold' foreground='#ce8563'>II</span>  Applications";
+    display-windows: "<span font_family='Shippori Mincho' weight='bold' foreground='#ce8563'>III</span>  Windows";
+    display-run: "<span font_family='Shippori Mincho' weight='bold' foreground='#ce8563'>IV</span>  Run";
+}
+
+* {
+    bg:        #0a1626;
+    surface:   #283a51;
+    text:      #f6e7c0;
+    muted:     #a39682;
+    accent:    #ce8563;
+    hair:      #f6e7c029;
+    hair-soft: #f6e7c01f;
+    row-rule:  #f6e7c00f;
+    cream-09:  #f6e7c017;
+
+    background-color: transparent;
+    text-color: @text;
+    spacing: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+window {
+    location: north;
+    anchor: north;
+    x-offset: 0;
+    y-offset: 68px;          /* the 32px top bar counts too: ~100px from the screen edge */
+    width: 760px;
+    padding: 4px;
+    background-color: #0a1626cc;
+    border: 1px;
+    border-color: @hair;
+    border-radius: 0;
+    children: [ mainbox ];
+}
+
+/* the inset hairline frame, 4px inside the window edge */
+mainbox {
+    border: 1px;
+    border-color: @hair-soft;
+    border-radius: 0;
+    padding: 14px 18px 12px 18px;
+    spacing: 12px;
+    children: [ mode-switcher, inputbar, message, listview, box-footer ];
+}
+
+/* ---- index tabs ---- */
+mode-switcher { spacing: 6px; }
+button {
+    padding: 6px 14px;
+    border: 1px;
+    border-color: transparent;
+    border-radius: 0;
+    text-color: @muted;
+    markup: true;
+}
+button selected {
+    background-color: @cream-09;
+    border-color: @hair;
+    text-color: @text;
+}
+
+/* ---- search row ---- */
+inputbar {
+    children: [ textbox-search, entry, textbox-esc ];
+    spacing: 12px;
+    padding: 8px 6px 12px 6px;
+    border: 0 0 1px 0;
+    border-color: @row-rule;
+}
+textbox-search {
+    expand: false;
+    width: 26px;
+    horizontal-align: 0.0;
+    content: "";
+    font: "JetBrainsMono Nerd Font 15";
+    text-color: @muted;
+    vertical-align: 0.5;
+}
+entry {
+    font: "Zen Kaku Gothic New, Noto Sans CJK JP 16.5";
+    placeholder: "Search the catalog";
+    placeholder-color: @muted;
+    cursor-color: @accent;
+    cursor-width: 2px;
+    expand: true;
+    horizontal-align: 0.0;
+    vertical-align: 0.5;
+}
+textbox-esc {
+    content: "esc";
+    font: "JetBrainsMono Nerd Font 8";
+    text-color: @muted;
+    padding: 3px 8px;
+    border: 1px;
+    border-color: @hair;
+    border-radius: 0;
+    vertical-align: 0.5;
+    expand: false;
+}
+
+/* ---- calculator / messages ---- */
+message {
+    padding: 4px 6px 8px 6px;
+    children: [ textbox ];
+}
+textbox { markup: true; }
+
+/* ---- rows: a spine, name over sub line, and a ribbon when selected ---- */
+listview {
+    lines: 7;
+    columns: 1;
+    fixed-height: true;
+    scrollbar: false;
+    spacing: 0;
+    cycle: false;
+}
+element {
+    padding: 8px 12px 8px 8px;
+    spacing: 14px;
+    border: 0 0 1px 0;
+    border-color: @row-rule;
+    children: [ element-icon, element-text, element-index ];
+}
+element selected.normal {
+    background-color: @cream-09;
+    border: 1px;
+    border-color: #ce856380;
+    border-radius: 0;
+}
+element-icon {
+    size: 38px;
+    vertical-align: 0.5;
+}
+element-text {
+    vertical-align: 0.5;
+    highlight: bold #ce8563;
+    text-color: @text;
+}
+/* the bookmark ribbon: element-index is the only free widget in a row, so it
+   is a plain terracotta tab that appears on the selected row */
+element-index {
+    expand: false;
+    padding: 0 9px;
+    margin: -8px 0 12px 0;
+    background-color: transparent;
+    text-color: transparent;
+    border-radius: 0 0 3px 3px;
+}
+element-index selected.normal {
+    background-color: @accent;
+    text-color: @accent;
+}
+
+/* ---- footer keycaps ---- */
+box-footer {
+    expand: false;
+    orientation: horizontal;
+    children: [ textbox-keys, textbox-brand ];
+    padding: 10px 6px 0 6px;
+    border: 1px 0 0 0;
+    border-color: @row-rule;
+}
+textbox-keys {
+    expand: true;
+    markup: true;
+    content: "<span font_family='JetBrainsMono Nerd Font' size='8250' background='#f6e7c01f'> ↵ </span> <span size='9750' foreground='#a39682'>Open</span>    <span font_family='JetBrainsMono Nerd Font' size='8250' background='#f6e7c01f'> ⇥ </span> <span size='9750' foreground='#a39682'>Next drawer</span>    <span font_family='JetBrainsMono Nerd Font' size='8250' background='#f6e7c01f'> ↑ ↓ </span> <span size='9750' foreground='#a39682'>Move</span>";
+}
+textbox-brand {
+    expand: false;
+    content: "Super + Space";
+    font: "JetBrainsMono Nerd Font 8";
+    text-color: @muted;
+    horizontal-align: 1;
+}

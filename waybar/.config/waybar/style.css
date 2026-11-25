@@ -1,0 +1,129 @@
+/* Library letterbox. bg #0a1626, bar #070f1c, surface #283a51, text #f6e7c0,
+   muted #8e7f6b, accent #ce8563, accent2 #a65651, highlight #dfba88, green #c8cdab */
+
+* {
+    /* Noto Serif for the text (sturdy lining figures); Nerd Font only supplies icons */
+    font-family: "Noto Serif", "Noto Serif CJK JP", "JetBrainsMono Nerd Font", serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+window#waybar {
+    background: rgba(7, 15, 28, 0.88);
+    color: #f6e7c0;
+}
+
+/* 3px double rule (line, gap, line) facing the screen content */
+window#waybar.top {
+    border-bottom: 3px double #3a4d68;
+}
+
+/* ---- workspaces: roman numerals ---- */
+#workspaces {
+    margin-left: 14px;
+}
+
+#workspaces button {
+    font-family: "Shippori Mincho", "Noto Serif CJK JP", serif;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 0 9px;
+    margin: 0;
+    background: transparent;
+    color: #8e7f6b;
+    border-bottom: 2px solid transparent;
+}
+
+#workspaces button.empty {
+    color: #4d5565;
+}
+
+#workspaces button:hover {
+    background: rgba(40, 58, 81, 0.6);
+    color: #dfba88;
+}
+
+/* shown on a monitor that does not have focus */
+#workspaces button.visible {
+    color: #dfba88;
+    border-bottom: 2px solid #3a4d68;
+}
+
+#workspaces button.active {
+    color: #f6e7c0;
+    border-bottom: 2px solid #ce8563;
+}
+
+#workspaces button.urgent {
+    color: #a65651;
+    border-bottom: 2px solid #a65651;
+}
+
+/* ---- right side: macOS-style menu extras ---- */
+#tray,
+#pulseaudio,
+#bluetooth,
+#network,
+#battery,
+#clock {
+    color: #f6e7c0;
+    padding: 0 9px;
+    margin: 4px 1px;
+    border-radius: 0;
+    font-size: 13px;
+}
+
+/* the soft highlight a menu extra gets under the pointer */
+#pulseaudio:hover,
+#bluetooth:hover,
+#network:hover,
+#battery:hover,
+#clock:hover {
+    background-color: rgba(246, 231, 192, 0.13);
+}
+
+#tray {
+    padding: 0 6px;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+}
+
+/* date and time, flush against the right edge */
+#clock {
+    margin-right: 8px;
+    padding: 0 10px;
+}
+
+#network.disconnected,
+#pulseaudio.muted,
+#bluetooth.off,
+#bluetooth.disabled {
+    color: #8e7f6b;
+}
+
+#bluetooth.connected {
+    color: #f6e7c0;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #c8cdab;
+}
+
+#battery.warning:not(.charging) {
+    color: #dfba88;
+}
+
+#battery.critical:not(.charging) {
+    color: #a65651;
+}

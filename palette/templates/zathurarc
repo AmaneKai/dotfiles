@@ -1,0 +1,40 @@
+# Cream page, navy text. recolor maps white to the light colour and black to
+# the dark colour, so pages render as cream paper with navy ink.
+set font "Shippori Mincho 11"
+
+set recolor true
+set recolor-lightcolor "{{text}}"
+set recolor-darkcolor  "{{bg}}"
+set recolor-keephue    false
+
+set default-bg "{{bg}}"
+set default-fg "{{text}}"
+
+set statusbar-bg "{{bar}}"
+set statusbar-fg "{{text}}"
+set inputbar-bg  "{{bar}}"
+set inputbar-fg  "{{text}}"
+
+set notification-bg         "{{bar}}"
+set notification-fg         "{{text}}"
+set notification-error-bg   "{{accent2}}"
+set notification-error-fg   "{{text}}"
+set notification-warning-bg "{{gold}}"
+set notification-warning-fg "{{bg}}"
+
+set completion-bg           "{{bar}}"
+set completion-fg           "{{dim}}"
+set completion-highlight-bg "{{surface}}"
+set completion-highlight-fg "{{text}}"
+set completion-group-bg     "{{bar}}"
+set completion-group-fg     "{{accent}}"
+
+set highlight-color        "{{accent:css:0.45}}"
+set highlight-active-color "{{gold:css:0.6}}"
+
+set index-bg        "{{bg}}"
+set index-fg        "{{text}}"
+set index-active-bg "{{surface}}"
+set index-active-fg "{{text}}"
+
+set selection-clipboard clipboard

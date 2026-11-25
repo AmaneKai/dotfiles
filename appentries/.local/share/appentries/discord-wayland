@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -u
+
+readonly LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/discord"
+readonly LOG_FILE="$LOG_DIR/stderr.log"
+readonly DISCORD=/usr/bin/discord
+readonly FLAGS=(
+    --ozone-platform-hint=auto
+    --enable-features=WebRTCPipeWireCapturer
+    --disable-accelerated-video-decode
+    --disable-features=VaapiVideoDecoder,VaapiVideoEncoder,AcceleratedVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL
+    --enable-logging=stderr
+)
+
+[[ -x $DISCORD ]] || { echo "discord-wayland: $DISCORD not found" >&2; exit 1; }
+mkdir -p "$LOG_DIR"
+exec "$DISCORD" "${FLAGS[@]}" "$@" 2>>"$LOG_FILE"

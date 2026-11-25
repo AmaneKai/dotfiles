@@ -1,0 +1,29 @@
+// bg #0a1626  bar #070f1c  surface #283a51  text #f6e7c0  muted #8e7f6b
+// accent #ce8563  accent2 #a65651  highlight #dfba88  green #c8cdab
+
+* {
+  all: unset;
+}
+
+// a slim strip in the margin of the screen, like marginalia. No padding of its
+// own: with no characters it collapses to nothing when idle.
+.title-column {
+  background-color: rgba(7, 15, 28, 0.88);
+  border-left: 1px solid #3a4d68;
+  min-width: 23px;
+}
+
+.title-column > label:first-child {
+  padding-top: 10px;
+}
+
+.title-column > label:last-child {
+  padding-bottom: 10px;
+}
+
+.ch {
+  font-family: "Shippori Mincho", "Noto Serif CJK JP", serif;
+  font-size: 15px;
+  color: #f6e7c0;
+  padding: 0;
+}
