@@ -16,7 +16,7 @@ return {
         nerd_font_variant = "mono",
       },
       completion = {
-        menu = { auto_show = true },
+        menu = { auto_show = function() return vim.bo.filetype == "markdown" end },
         documentation = { auto_show = true, auto_show_delay_ms = 200 },
         ghost_text = { enabled = false },
         accept = { auto_brackets = { enabled = false } },

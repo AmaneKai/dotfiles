@@ -31,7 +31,7 @@ return {
       })
       local dict_path = vim.fn.stdpath("config") .. "/spell/ltex-dictionary.txt"
       vim.lsp.config("ltex_plus", {
-        filetypes = { "markdown", "text", "tex", "typst" },
+        filetypes = { "markdown", "typst" },
         settings = {
           ltex = {
             language = "en-US",
@@ -42,7 +42,8 @@ return {
           },
         },
       })
-      vim.lsp.enable(servers)
+      -- only spell check is on; use vim.lsp.enable(servers) to re-enable everything
+      vim.lsp.enable("ltex_plus")
 
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(ev)
