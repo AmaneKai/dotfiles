@@ -1,7 +1,6 @@
 local TWO_SPACE_FILETYPES = {
   "javascript", "typescript", "javascriptreact", "typescriptreact",
   "html", "css", "scss", "json", "jsonc", "svelte", "vue",
-  "cpp",
 }
 
 vim.api.nvim_create_autocmd("FileType", {
