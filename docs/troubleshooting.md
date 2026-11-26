@@ -79,7 +79,7 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Mouse selection does not reach the system clipboard | Only the `MouseDragEnd1Pane` copy-mode-vi binding pipes to `xclip` | Install xclip. Select with the mouse in copy mode |
+| Mouse selection does not reach the system clipboard | Copy-mode pipes to `wl-copy` on Wayland, `xclip` on X11 | Install wl-clipboard or xclip. Select with the mouse in copy mode |
 | `prefix t` popup closes at once | `hopes` not on PATH | `go install github.com/AmaneKai/hopes@latest` |
 | `prefix t` opens an old hopes | An older copy in `/usr/local/bin` or `~/.cargo/bin` comes first in PATH | Check `type -a hopes` and remove the stale copy |
 

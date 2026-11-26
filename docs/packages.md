@@ -162,7 +162,9 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | Tool | Used by | Where | Arch | Fedora | Debian family |
 | --- | --- | --- | --- | --- | --- |
 | tmux | multiplexer | `tmux/.tmux.conf` | tmux | tmux | tmux |
-| xclip | copy to clipboard | `tmux/.tmux.conf` | xclip | xclip | xclip |
+| wl-clipboard | copy to clipboard (Wayland) | `tmux/.tmux.conf` | wl-clipboard | wl-clipboard | wl-clipboard |
+| xclip | copy to clipboard (X11) | `tmux/.tmux.conf` | xclip | xclip | xclip |
+| spf (superfile) | popup on `prefix e` | `tmux/.tmux.conf` | superfile | manual | manual |
 | fzf | sessionizer | `bin/tmux-sessionizer` | fzf | fzf | fzf |
 | hopes | popup on `prefix t` / `prefix T` | `tmux/.tmux.conf` | manual (go install) | manual (go install) | manual (go install) |
 

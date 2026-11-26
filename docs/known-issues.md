@@ -20,9 +20,9 @@ Open problems in the configs. Checked 2026-09-28 on branch `linux`; line numbers
 | `polybar/.config/polybar/config.ini` | 146-147 | `BAT1`, `AC` (CF-SV7 names) |
 | `system/etc/X11/xorg.conf.d/70-synaptics.conf` | 12-15 | Touchpad edges for the CF-SV7 circular pad |
 | `autorandr/.config/autorandr/laptop/` | all | Profile for the CF-SV7 panel (`eDP-1`, 1920x1200). `autorandr --save laptop` on another machine overwrites it in the repo |
-| `bin/tmux-sessionizer` | 3-11 | Search paths `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*` |
-| `tmux/.tmux.conf` | 30-33 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads` |
-| `tmux/.tmux.conf` | 36 | `hopes` resolved from PATH. A copy in `/usr/local/bin` shadows `$(go env GOPATH)/bin` |
+| `bin/tmux-sessionizer` | 3-12 | Search paths `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*`, `~/LBYARCH` |
+| `tmux/.tmux.conf` | 79-82, 84 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads`, `~/LBYARCH` |
+| `tmux/.tmux.conf` | 90 | `hopes` resolved from PATH. A copy in `/usr/local/bin` shadows `$(go env GOPATH)/bin` |
 | `dunst/.config/dunst/dunstrc` | 21 | `/usr/share/icons/Papirus-Dark/32x32/` |
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
 | `nvim/.config/nvim/lua/plugins/markdown.lua` | 14 | Port 8081 |

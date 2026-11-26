@@ -8,6 +8,7 @@ SEARCH_PATHS=(
     "$HOME/Downloads"
     "$HOME/Pictures/Recordings/"
     "$HOME/Pictures/Screenshots/"
+    "$HOME/LBYARCH"
 )
 
 list_potential_sessions() {
