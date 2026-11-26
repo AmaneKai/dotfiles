@@ -17,8 +17,8 @@ Open problems in the configs. Checked 2026-09-29 on branch `master`; line number
 | `zsh/.zshrc` | 46 | `ctags` alias to `/opt/homebrew/bin/ctags` |
 | `zsh/.zshrc` | 75 | `schd` opens `~/College/Schedule/Y2T3/image.png` |
 | `bin/tmux-sessionizer` | 4-11 | Search paths `~/Dotfiles`, `~/Github`, `~/Codes`, `~/College`, `~/Downloads`, `~/Pictures/*`, `~/LBYARCH` |
-| `tmux/.tmux.conf` | 31-36 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads`, `~/LBYARCH` |
-| `tmux/.tmux.conf` | 38 | `$HOME/.cargo/bin/hopes` |
+| `tmux/.tmux.conf` | 79-82, 84 | Jump keys for `~/Github`, `~/College`, `~/Codes`, `~/Downloads`, `~/LBYARCH` |
+| `tmux/.tmux.conf` | 90 | `$HOME/Dotfiles/bin/hopes` |
 | `nvim/.config/nvim/lua/plugins/liveserver.lua` | 6, 8 | Port 6767, browser `brave browser` |
 | `nvim/.config/nvim/lua/plugins/markdown.lua` | 14 | Port 8081 |
 | `nvim/.config/nvim/lua/plugins/ipynb-peek.lua`, `md-peek.lua` | 4 | Local dev path `~/Github/...` (used only when `use_local_dev = true`) |
