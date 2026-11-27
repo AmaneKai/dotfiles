@@ -22,6 +22,12 @@ config.default_cursor_style = 'SteadyBlock'
 config.audible_bell = 'Disabled'
 config.use_ime = true
 
+-- Open as a maximized window (still windowed, not fullscreen)
+wezterm.on('gui-startup', function(cmd)
+  local _, _, window = wezterm.mux.spawn_window(cmd or {})
+  window:gui_window():maximize()
+end)
+
 -- FONT
 config.font = wezterm.font_with_fallback {
   'JetBrainsMono Nerd Font',

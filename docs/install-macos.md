@@ -26,7 +26,7 @@ brew install --cask ghostty font-jetbrains-mono-nerd-font libreoffice brave-brow
 
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 "$(brew --prefix rustup)/bin/rustup" default stable
-mkdir -p ~/.npm-global ~/.config ~/.local/bin ~/.local/share/nvim
+mkdir -p ~/.npm-global ~/.config ~/.emacs.d ~/.local/bin ~/.local/share/nvim
 npm config set prefix ~/.npm-global
 
 python3 -m venv ~/.local/share/nvim/debugpy
@@ -41,7 +41,7 @@ cd ~/Dotfiles
 for file in ~/.zshrc ~/.tmux.conf ~/.gitconfig; do
     [ -e "$file" ] && [ ! -L "$file" ] && mv "$file" "$file.pre-stow"
 done
-stow ghostty git nvim scripts tmux zsh
+stow emacs ghostty git nvim scripts tmux zsh
 
 nvim --headless "+Lazy! restore" +qa
 exec zsh

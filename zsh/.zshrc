@@ -116,3 +116,6 @@ if [[ "$OSTYPE" == darwin* ]]; then
     cleanup-dsstore &!
     organize-screenshots &!
 fi
+
+# bun completions
+[ -s "/Users/callo/.bun/_bun" ] && source "/Users/callo/.bun/_bun"
