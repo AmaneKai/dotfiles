@@ -10,6 +10,15 @@
  '(org-enforce-todo-dependencies nil)
  '(org-modules '(org-habit))
  '(org-refile-use-outline-path 'file)
+ '(package-selected-packages
+   '(ag clojure-mode cmake-mode company d-mode dash dockerfile-mode elpy
+        glsl-mode go-mode graphviz-dot-mode gruber-darker-theme
+        haskell-mode helm helm-org ido-completing-read+ jinja2-mode
+        kotlin-mode magit markdown-mode move-text multiple-cursors
+        nginx-mode nim-mode nix-mode org-cliplink paredit php-mode
+        powershell proof-general purescript-mode qml-mode racket-mode
+        rfc-mode rust-mode scala-mode smex sml-mode tide toml-mode
+        tuareg typescript-mode uxntal-mode yaml-mode yasnippet))
  '(warning-minimum-level :error)
  '(whitespace-style
    '(face tabs spaces trailing space-before-tab newline indentation empty

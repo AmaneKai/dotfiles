@@ -143,3 +143,19 @@ This command does the inverse of `fill-paragraph'."
 (setq confirm-kill-emacs 'y-or-n-p)
 
 (windmove-default-keybindings)
+
+;;; Font zoom, graphical frames only (a terminal zooms with its own keys)
+(defun rc/zoom (step)
+  "Change the default font height by STEP tenths of a point."
+  (set-face-attribute 'default nil :height
+                      (max 60 (+ (face-attribute 'default :height) step))))
+
+(defun rc/zoom-in () (interactive) (rc/zoom 10))
+(defun rc/zoom-out () (interactive) (rc/zoom -10))
+(defun rc/zoom-reset () (interactive)
+  (set-face-attribute 'default nil :height 160))
+
+(global-set-key (kbd "C-=") 'rc/zoom-in)
+(global-set-key (kbd "C-+") 'rc/zoom-in)
+(global-set-key (kbd "C--") 'rc/zoom-out)
+(global-set-key (kbd "C-0") 'rc/zoom-reset)

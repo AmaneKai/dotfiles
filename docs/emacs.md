@@ -98,6 +98,10 @@ Arrow keys work too. Inside tmux, press `C-a` twice, because `C-a` is the tmux p
 | `C-h m` | keys for the current mode |
 | `M-x` | run any command by name |
 
+## Font size
+
+In a window (`emg`): `C-=` or `C-+` bigger, `C--` smaller, `C-0` reset. In the terminal (`em`), use the terminal's own zoom keys.
+
 ## What this config adds
 
 Learn these after the keys above.
@@ -158,6 +162,7 @@ mkdir -p ~/Documents/Agenda && touch ~/Documents/Agenda/Tasks.org
 
 | Path in `emacs/.emacs.d` | Content |
 | --- | --- |
+| `early-init.el` | dark colours for the first frame |
 | `init.el` | theme, packages, most keys |
 | `rc/rc.el` | package install helpers |
 | `rc/misc-rc.el` | general settings and small commands |
