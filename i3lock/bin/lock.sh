@@ -1,54 +1,62 @@
 #!/usr/bin/env bash
+# Lock screen: flat Rose Pine base, clock, date, and a thin line that jumps as
+# you type. No ring. Needs i3lock-color; anything else gets a plain lock.
 
-readonly LOCK_IMAGE="/tmp/lock_screen.png"
-readonly LOCK_GENERATOR="$HOME/.config/i3/scripts/lock-gen.py"
 readonly FONT="JetBrainsMono Nerd Font"
-readonly BACKGROUND_COLOR="191724"
 
-background_args=(-c "$BACKGROUND_COLOR")
+readonly BASE=191724
+readonly TEXT=e0def4ff
+readonly MUTED=6e6a86ff
+readonly OVERLAY=26233aff
+readonly IRIS=c4a7e7ff
+readonly LOVE=eb6f92ff
 
-generate_blurred_screenshot() {
-  rm -f "$LOCK_IMAGE"
-  python3 "$LOCK_GENERATOR" "$LOCK_IMAGE" 2>/dev/null
-  [[ -s "$LOCK_IMAGE" ]] && background_args+=(--image "$LOCK_IMAGE")
-}
+styled=(
+  --color="$BASE"
 
-lock_with_i3lock_color() {
-  i3lock "$@" "${background_args[@]}" \
-    --clock \
-    --time-str="%H:%M" \
-    --date-str="%A, %B %d" \
-    --time-font="$FONT" \
-    --date-font="$FONT" \
-    --time-size=36 \
-    --date-size=14 \
-    --time-color=e0def4ff \
-    --date-color=6e6a86ff \
-    --ring-color=9ccfd855 \
-    --ringver-color=c4a7e7ff \
-    --ringwrong-color=eb6f92ff \
-    --inside-color=1f1d2ecc \
-    --insidever-color=1f1d2ecc \
-    --insidewrong-color=1f1d2eee \
-    --line-color=9ccfd830 \
-    --keyhl-color=9ccfd8ff \
-    --bshl-color=eb6f92ff \
-    --separator-color=26233aff \
-    --verif-color=c4a7e7ff \
-    --wrong-color=eb6f92ff \
-    --verif-text="..." \
-    --wrong-text="x" \
-    --verif-font="$FONT" \
-    --wrong-font="$FONT" \
-    --radius=95 \
-    --ring-width=5 \
-    --indicator
-}
+  --clock
+  --indicator
+  --time-str="%H:%M"
+  --time-font="$FONT"
+  --time-size=96
+  --time-color="$TEXT"
+  --time-pos="w/2:h/2-20"
+  --date-str="%A, %d %B"
+  --date-font="$FONT"
+  --date-size=18
+  --date-color="$MUTED"
+  --date-pos="w/2:h/2+24"
 
-lock_with_plain_i3lock() {
-  i3lock "$@" "${background_args[@]}"
-}
+  # the typing line replaces the ring
+  --bar-indicator
+  --bar-pos="w/2-160:h/2+70"
+  --bar-total-width=320
+  --bar-count=32
+  --bar-max-height=10
+  --bar-base-width=2
+  --bar-color="$OVERLAY"
+  --keyhl-color="$IRIS"
+  --bshl-color="$LOVE"
+  --ringver-color="$IRIS"
+  --ringwrong-color="$LOVE"
 
-generate_blurred_screenshot
-lock_with_i3lock_color "$@" || lock_with_plain_i3lock "$@"
-rm -f "$LOCK_IMAGE"
+  --verif-text="checking"
+  --verif-font="$FONT"
+  --verif-size=14
+  --verif-color="$IRIS"
+  --verif-pos="w/2:h/2+110"
+  --wrong-text="wrong password"
+  --wrong-font="$FONT"
+  --wrong-size=14
+  --wrong-color="$LOVE"
+  --wrong-pos="w/2:h/2+110"
+  --noinput-text=""
+)
+
+i3lock "$@" "${styled[@]}" &
+locker=$!
+
+# xss-lock holds off suspend until every copy of this fd is closed.
+[[ -n "${XSS_SLEEP_LOCK_FD:-}" ]] && exec {XSS_SLEEP_LOCK_FD}<&-
+
+wait "$locker" || exec i3lock "$@" --color="$BASE"

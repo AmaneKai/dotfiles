@@ -20,8 +20,7 @@ Symptom, cause, fix. Details for CF-SV7 items are in `docs/hardware-cf-sv7.md`.
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
-| Plain dark screen with no blur after sleep or `$mod+u` | Python Pillow or `maim` missing, so `lock-gen.py` makes no image; `lock.sh` falls back to a solid color | Install Pillow and NumPy (Arch `python-pillow python-numpy`). Type the password and press Enter to unlock |
-| Lock screen shows a plain blurred image, no clock or ring | Plain `i3lock` installed; `lock.sh` fell back | Install i3lock-color (Arch AUR `i3lock-color`, others from source) |
+| Lock screen is a flat dark color with no clock, and typing shows a ring | Plain `i3lock` installed, or `i3lock-color` rejected an option; `lock.sh` fell back | Install i3lock-color (Arch AUR or CachyOS `i3lock-color`, others from source) |
 
 ## Bar and desktop
 
