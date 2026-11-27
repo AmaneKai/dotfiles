@@ -15,7 +15,7 @@ config.macos_window_background_blur = 20
 config.window_padding = {
   left = 10,
   right = 10,
-  top = 40,
+  top = 20,
   bottom = 10,
 }
 config.default_cursor_style = 'SteadyBlock'

@@ -14,7 +14,7 @@ exec --no-startup-id nm-applet
 floating_modifier $mod
 tiling_drag modifier titlebar
 
-bindsym $mod+Return exec ghostty
+bindsym $mod+Return exec wezterm 
 bindsym $mod+space exec --no-startup-id dmenu_run
 bindsym $mod+q kill
 bindsym $mod+Shift+space floating toggle
