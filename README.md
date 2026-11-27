@@ -8,6 +8,7 @@ i3 (X11) desktop, shell, and editor configs for Arch, Fedora, and the Debian fam
 | --- | --- | --- |
 | autorandr | polybar relaunch on display change | `~/.config/autorandr/postswitch.d/polybar` |
 | dunst | notifications | `~/.config/dunst/dunstrc` |
+| emacs | Emacs, adapted from [rexim/dotfiles](https://github.com/rexim/dotfiles) | `~/.emacs.d/` |
 | fastfetch | system info | `~/.config/fastfetch/` |
 | fish | fish shell | `~/.config/fish/config.fish` |
 | ghostty | ghostty terminal | `~/.config/ghostty/config` |
@@ -42,11 +43,11 @@ Not stowed: `bin/` (added to PATH by zsh and fish), `system/` (copied to `/etc` 
 
 ## Quick start
 
-Arch or CachyOS with KDE Plasma (Wayland): clone the repo, check out `linux`, run `./bootstrap.sh` (`--dry-run` to preview, `--skip <step>` / `--only <step>` with steps `packages aur stow installers system kde`), then log out and back in. It installs packages, stows `fish ghostty git nvim tmux fastfetch scripts zsh kde`, and sets locale, Japanese layout and input, Roboto Mono and the wallpaper. SSH keys and logins are not restored. The manual steps for i3 and other distros follow.
+Arch or CachyOS with KDE Plasma (Wayland): clone the repo, check out `linux`, run `./bootstrap.sh` (`--dry-run` to preview, `--skip <step>` / `--only <step>` with steps `packages aur stow installers system kde`), then log out and back in. It installs packages, stows `emacs fish ghostty git nvim tmux fastfetch scripts zsh kde`, and sets locale, Japanese layout and input, Roboto Mono and the wallpaper. SSH keys and logins are not restored. The manual steps for i3 and other distros follow.
 
 1. Install packages for your distro: [Arch](docs/install-arch.md), [Fedora](docs/install-fedora.md), [Debian family](docs/install-debian.md).
 2. Clone and check out `linux`. `~/Dotfiles` is the default location; zsh, fish and tmux resolve the real path from the symlinks.
-3. Run `mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons`.
+3. Run `mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons ~/.emacs.d`.
 4. From `~/Dotfiles`, run `stow <packages>`.
 5. Run `~/Dotfiles/system/install.sh`.
 6. Reboot and run `startx`.
@@ -61,6 +62,7 @@ Arch or CachyOS with KDE Plasma (Wayland): clone the repo, check out `linux`, ru
 | [docs/install-fedora.md](docs/install-fedora.md) | fresh install on Fedora |
 | [docs/install-debian.md](docs/install-debian.md) | fresh install on Debian, Ubuntu, Mint |
 | [docs/hardware-cf-sv7.md](docs/hardware-cf-sv7.md) | CF-SV7 touchpad, F-keys, Bluetooth, power |
+| [docs/emacs.md](docs/emacs.md) | Emacs beginner guide and keys |
 | [docs/neovim.md](docs/neovim.md) | Neovim plugins, languages, keymaps |
 | [docs/library-rice.md](docs/library-rice.md) | Hyprland library rice: layout, shell IPC, quirks |
 | [docs/fconv.md](docs/fconv.md) | fconv converter usage |

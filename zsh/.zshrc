@@ -43,6 +43,9 @@ command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
 bindkey -s '^f' 'tmux-sessionizer\n'
 
 alias vi="nvim"
+# -a '' starts the Emacs daemon on first use
+alias em="emacsclient -nw -a ''"
+alias emg="emacsclient -c -n -a ''"
 
 alias ls="eza --icons=auto"
 alias ll="eza -lg --icons=auto"

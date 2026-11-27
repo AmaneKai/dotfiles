@@ -6,7 +6,7 @@
 set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
-STOW_PKGS=(fish ghostty git nvim tmux fastfetch scripts zsh kde)
+STOW_PKGS=(emacs fish ghostty git nvim tmux fastfetch scripts zsh kde)
 WALLPAPER_NAME=anime_skull.png
 FONT="Roboto Mono"
 
@@ -14,7 +14,7 @@ PACMAN_PKGS=(
   git stow base-devel curl tar unzip gzip
   zsh fish zoxide eza fzf yt-dlp gradle go bun deno jdk-openjdk nodejs npm rustup xdg-user-dirs
   tmux xclip wl-clipboard
-  neovim tree-sitter-cli ripgrep fd luarocks ruff prettier eslint_d ipython gdb delve
+  emacs neovim tree-sitter-cli ripgrep fd luarocks ruff prettier eslint_d ipython gdb delve
   ffmpeg bc fastfetch ghostty opencode
   ttf-jetbrains-mono-nerd ttf-roboto-mono adobe-source-han-sans-jp-fonts noto-fonts-cjk noto-fonts-emoji papirus-icon-theme
   fcitx5 fcitx5-mozc fcitx5-gtk fcitx5-qt fcitx5-configtool
@@ -87,7 +87,7 @@ backup_conflicts() {
 
 step_stow() {
   log "Stowing dotfiles"
-  run mkdir -p "$HOME/.config" "$HOME/.local/bin" "$HOME/bin"
+  run mkdir -p "$HOME/.config" "$HOME/.local/bin" "$HOME/bin" "$HOME/.emacs.d"
   backup_conflicts
   # jdtls in the repo is an absolute symlink, which stow refuses; ignore it.
   run stow -d "$DOTFILES" -t "$HOME" --ignore='jdtls' --restow "${STOW_PKGS[@]}"

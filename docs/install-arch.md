@@ -86,6 +86,7 @@ tmux:
 
 ```bash
 sudo pacman -S --needed tmux xclip fzf
+sudo pacman -S --needed emacs
 ```
 
 nvim:
@@ -157,11 +158,11 @@ git checkout linux
 Create the parent directories first so stow links files, not whole directories. Otherwise installers that write to `~/.local/bin` or `~/bin` write into the repo. Move existing shell and X start files out of the way.
 
 ```bash
-mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons
+mkdir -p ~/.config ~/.config/gtk-3.0 ~/.config/gtk-4.0 ~/.local/bin ~/bin ~/.icons ~/.emacs.d
 mv ~/.zshrc ~/.zshrc.pre-stow 2>/dev/null
 mv ~/.xinitrc ~/.xinitrc.pre-stow 2>/dev/null
 cd ~/Dotfiles
-stow autorandr dunst fastfetch fish ghostty git gtk i3 i3lock nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
+stow autorandr dunst emacs fastfetch fish ghostty git gtk i3 i3lock nmdmenu nvim picom polybar rofi scripts tmux wezterm xinit xresources zsh
 ```
 
 ## 9. System files

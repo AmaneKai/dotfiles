@@ -168,6 +168,12 @@ Do not install `tlp` with power-profiles-daemon. On Fedora, `tuned-ppd` conflict
 | fzf | sessionizer | `bin/tmux-sessionizer` | fzf | fzf | fzf |
 | hopes | popup on `prefix t` / `prefix T` | `tmux/.tmux.conf` | manual (go install) | manual (go install) | manual (go install) |
 
+## emacs package
+
+| Tool | Used by | Where | Arch | Fedora | Debian family |
+| --- | --- | --- | --- | --- | --- |
+| Emacs | editor, `em` and `emg` aliases | `emacs/.emacs.d`, `zsh/.zshrc` | emacs | emacs | emacs |
+
 ## nvim package
 
 | Tool | Used by | Where | Arch | Fedora | Debian family |
